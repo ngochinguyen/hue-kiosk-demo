@@ -171,6 +171,14 @@
   .step-ctl button:disabled{opacity:.3;cursor:default}
   .step-ctl .n{width:26px;text-align:center;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
 
+  /* service variants */
+  .vchips{display:flex;gap:8px;flex-wrap:wrap}
+  .vchip{flex:1;min-width:45%;border:1.5px solid var(--k-line);background:#fff;border-radius:10px;
+    padding:9px 8px;font-size:10.5px;font-weight:700;color:var(--k-soft);cursor:pointer;line-height:1.3;text-align:center}
+  .vchip.on{border-color:var(--k-gold-deep);background:#FFFBEE;color:var(--k-ink)}
+  .svc-note{font-size:9px;color:var(--k-faint);margin-top:2px;line-height:1.5;text-align:center}
+  .rowp{display:block;font-size:8.5px;color:var(--k-faint);font-weight:600}
+
   /* cart */
   .cline{background:var(--k-card);border:1.5px solid var(--k-line);border-radius:12px;padding:11px 12px;display:flex;gap:10px;align-items:center}
   .cline .ci{flex:1}
@@ -267,7 +275,7 @@
   <header>
     <p class="eyebrow">Concept UI · Bản demo lấy ý kiến</p>
     <h1>Kiosk bán vé tự phục vụ — toàn trình chọn vé → thanh toán → xuất vé</h1>
-    <p class="lede">Prototype tương tác cho kiosk cảm ứng bán vé tham quan, tông tím Huế. Chạm trực tiếp vào màn hình mô phỏng để đi hết luồng mua vé, hoặc nhảy nhanh giữa các bước bằng thanh bên phải. Bộ chọn ngôn ngữ hoạt động thật: <b>Tiếng Việt / English / 中文</b> — toàn bộ giao diện, tên di tích và vé in đổi theo.</p>
+    <p class="lede">Prototype tương tác cho kiosk cảm ứng đặt tại cổng di tích, tông <b>tím Huế</b>. Bộ chọn ngôn ngữ hoạt động thật: chuyển <b>Tiếng Việt / English / 中文</b> — toàn bộ giao diện, tên di tích và vé in đổi theo. Bán cả <b>vé cổng (13 điểm · 8 tuyến) lẫn 5 nhóm dịch vụ đi kèm</b> (Audio Guide · chụp ảnh cổ phục · thuyết minh · xe điện · AR/XR) trong cùng 1 đơn. Giá theo bảng hiệu lực 02.06.2026.</p>
     <div class="chips">
       <span class="chip">Khung máy <b>600 × 500 × 1700 mm</b></span>
       <span class="chip">Màn cảm ứng dọc <b>27–32″ · 1080×1920</b></span>
@@ -327,6 +335,11 @@
                 <div><h4 data-i18n="t2h"></h4><p data-i18n="t2p"></p></div>
                 <span class="arr">›</span>
               </button>
+              <button class="type-card" data-mode="svc">
+                <span class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.2 4.9L19.5 9l-4 3.6 1.2 5.4L12 15.2 7.3 18l1.2-5.4-4-3.6 5.3-1.1L12 3z" stroke="#E9B949" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+                <div><h4 data-i18n="t3h"></h4><p data-i18n="t3p"></p></div>
+                <span class="arr">›</span>
+              </button>
               <p class="ksub" style="margin-top:8px" data-i18n="childNote"></p>
             </div>
           </section>
@@ -368,6 +381,48 @@
             <div class="kfoot">
               <button class="btn btn-ghost" data-go="list" data-i18n="back"></button>
               <button class="btn btn-gold" id="addBtn"><span data-i18n="addBtn"></span><small id="addSum">0đ</small></button>
+            </div>
+          </section>
+
+          <!-- S3b service list -->
+          <section class="scr" data-scr="svc">
+            <div class="khead">
+              <span class="hlogo" data-emb></span>
+              <div class="htxt">TRUNG TÂM BẢO TỒN DI TÍCH CỐ ĐÔ HUẾ<b>VÉ THAM QUAN DI TÍCH</b></div>
+              <div class="hlang" data-hlang></div>
+              <button class="hcancel" data-reset data-i18n="cancel"></button>
+            </div>
+            <div class="kstep" data-step="1"></div>
+            <div class="kbody">
+              <h3 class="ktitle" data-i18n="svcTitle"></h3>
+              <p class="ksub" data-i18n="svcSub"></p>
+              <div id="svcList" style="display:flex;flex-direction:column;gap:9px"></div>
+            </div>
+            <div class="kfoot">
+              <button class="btn btn-ghost" data-go="type" data-i18n="back"></button>
+              <button class="btn btn-gold" id="toCartFromSvc" data-go="cart" style="display:none"><span data-i18n="cartBtn"></span> (<span class="miniCount2">0</span>) ›</button>
+            </div>
+          </section>
+
+          <!-- S3c service detail -->
+          <section class="scr" data-scr="svcd">
+            <div class="khead">
+              <span class="hlogo" data-emb></span>
+              <div class="htxt">TRUNG TÂM BẢO TỒN DI TÍCH CỐ ĐÔ HUẾ<b>VÉ THAM QUAN DI TÍCH</b></div>
+              <div class="hlang" data-hlang></div>
+              <button class="hcancel" data-reset data-i18n="cancel"></button>
+            </div>
+            <div class="kstep" data-step="2"></div>
+            <div class="kbody">
+              <h3 class="ktitle" id="svcdTitle"></h3>
+              <p class="ksub" data-i18n="svcdSub"></p>
+              <div class="vchips" id="svcdVars"></div>
+              <div class="qty-item" id="svcdRows"></div>
+              <p class="svc-note" id="svcdNote"></p>
+            </div>
+            <div class="kfoot">
+              <button class="btn btn-ghost" data-go="svc" data-i18n="back"></button>
+              <button class="btn btn-gold" id="addSvcBtn"><span data-i18n="addBtn"></span><small id="addSvcSum">0đ</small></button>
             </div>
           </section>
 
@@ -503,7 +558,7 @@
     <!-- ================= RAIL ================= -->
     <aside class="rail">
       <div>
-        <h3>Luồng 8 màn hình</h3>
+        <h3>Luồng 10 màn hình</h3>
         <div class="steps" id="stepRail"></div>
       </div>
       <div>
@@ -552,7 +607,7 @@
 
   <footer class="pg-foot">
     <span>Giá vé theo bảng công bố áp dụng từ 02.06.2026 · Mã QR trong demo chỉ minh hoạ, không quét được</span>
-    <span>Concept v3 · tím Huế · VI/EN/中文 · 2026-07-11 · <a href="./app/" style="color:var(--pg-accent)">Xem bản Mobile App ›</a></span>
+    <span>Concept v4 · tím Huế · VI/EN/中文 · vé + 5 dịch vụ đi kèm · 2026-07-11 · <a href="./app/" style="color:var(--pg-accent)">Xem bản Mobile App ›</a></span>
   </footer>
 </div>
 
@@ -586,6 +641,71 @@
     {id:'t8',vi:'Tuyến gộp tất cả các điểm di tích',en:'All-sites pass — every monument',zh:'全景通票 — 所有遗迹景点',a:600000,c:120000}
   ];
   var ALL={}; DIEM.concat(TUYEN).forEach(function(x){ALL[x.id]=x;});
+
+  /* ---------- dịch vụ đi kèm ---------- */
+  var SVC=[
+    {id:'audio',from:50000,unit:'perTrip',
+      vars:[{id:'dn',rows:[{id:'dom',p:80000},{id:'int',p:100000}]},
+            {id:'lg',rows:[{id:'dom',p:50000},{id:'int',p:80000}]}]},
+    {id:'costume',from:50000,unit:'',
+      vars:[{id:'v1',rows:[{id:'adt',p:195000},{id:'chd',p:140000}]},
+            {id:'v2',rows:[{id:'adt',p:115000},{id:'chd',p:80000}]}],
+      extra:[{id:'kieu',p:50000},{id:'xekeo',p:55000}]},
+    {id:'guide',from:150000,unit:'perTrip',
+      vars:[{id:'one',rows:[{id:'gdn',p:200000},{id:'glg',p:150000}]}]},
+    {id:'ev',from:150000,unit:'perCar',
+      vars:[{id:'one',rows:[{id:'r90',p:450000},{id:'r60',p:300000},{id:'tm',p:240000},{id:'vq',p:180000},{id:'kt',p:180000},{id:'dtd',p:150000},{id:'btm',p:150000},{id:'p45',p:440000},{id:'p60',p:500000}]}]},
+    {id:'tech',from:35000,unit:'',
+      vars:[{id:'sim',rows:[{id:'vna',p:70000},{id:'vnc',p:35000},{id:'fa',p:100000},{id:'fc',p:50000}]},
+            {id:'xr',rows:[{id:'vna',p:140000},{id:'vnc',p:70000},{id:'fa',p:200000},{id:'fc',p:100000}]},
+            {id:'dauho',rows:[{id:'all',p:50000}]}]}
+  ];
+  var SVCMAP={}; SVC.forEach(function(s){SVCMAP[s.id]=s;});
+
+  var SVCTXT={
+    vi:{ui:{t3h:'Dịch vụ trải nghiệm đi kèm',t3p:'Audio Guide · chụp ảnh cổ phục · thuyết minh · xe điện · AR/XR',
+        svcTitle:'Dịch vụ trải nghiệm',svcSub:'Mua kèm cùng vé tham quan — nhận tại điểm',svcdSub:'Chọn hạng mục và số lượng',
+        perTrip:'/lượt',perCar:'/xe · tối đa 7 khách',svcFrom:'Từ'},
+      svc:{
+        audio:{n:'Audio Guide — thuyết minh tự động',d:'Thiết bị/app tự thuyết minh · 12 ngôn ngữ',v:{dn:'Khu vực Đại Nội',lg:'Các lăng: Minh Mạng · Tự Đức · Khải Định'},note:'Nhận thiết bị tại cổng Ngọ Môn và cổng vào các điểm tham quan'},
+        costume:{n:'Chụp ảnh trang phục cung đình',d:'Chụp cùng diễn viên trong trang phục cung đình',v:{v1:'Ngồi Ngai — có 2 cung nữ hầu',v2:'Ngồi Ngai — không có cung nữ'},note:'Tại nhà Hữu Vu (Đại Nội) · Minh Khiêm Đường (lăng Tự Đức)'},
+        guide:{n:'Hướng dẫn thuyết minh (HDV)',d:'Hướng dẫn viên người thật đi kèm · đặt theo lượt',v:{one:''},note:'Đặt tại các điểm bán vé · Tel/Zalo 0326 220 022'},
+        ev:{n:'Xe điện Hoàng Thành',d:'Xe điện đưa đón trong khu Đại Nội · giá theo xe (tối đa 7 khách)',v:{one:''},note:'Dịch vụ đối tác Hoàng Thành · nhà dịch vụ phía Tây Thái Hòa'},
+        tech:{n:'Trải nghiệm công nghệ (AR/XR)',d:'Phi thuyền · XR Tour · Đầu Hồ (AR Photo Kiosk 70–300k mua tại quầy)',v:{sim:'Phi thuyền (Simulator)',xr:'Nội dung XR (XR Tour)',dauho:'Trò chơi Đầu Hồ'},note:'Khu trải nghiệm trong Đại Nội'}},
+      rows:{dom:'Khách trong nước',int:'Khách quốc tế',adt:'Người lớn',chd:'Trẻ em',
+        kieu:'Chụp thêm — ngồi Kiệu',xekeo:'Chụp thêm — ngồi Xe kéo',
+        gdn:'Hoàng cung Huế (Đại Nội)',glg:'1 trong 3 lăng: Tự Đức · Khải Định · Minh Mạng',
+        r90:'Tham quan Đại Nội 90 phút',r60:'Tham quan Đại Nội 60 phút',tm:'Thế Miếu / Cung Diên Thọ – Bến xe Nguyễn Hoàng',vq:'Vòng quanh Hoàng Thành (không dừng)',kt:'Điện Kiến Trung – Bến xe Nguyễn Hoàng',dtd:'Nhà hát Duyệt Thị Đường – Bến xe',btm:'Đại Nội – Bảo tàng Cổ vật',p45:'Đón/trả bến xe + Đại Nội 45 phút',p60:'Đón/trả bến xe + Đại Nội 60 phút',
+        vna:'Khách VN — người lớn',vnc:'Khách VN — trẻ em',fa:'Quốc tế — người lớn',fc:'Quốc tế — trẻ em',all:'Vé chung mọi đối tượng'}},
+    en:{ui:{t3h:'Experiences & add-on services',t3p:'Audio guide · costume photos · tour guide · e-car · AR/XR',
+        svcTitle:'Experiences & services',svcSub:'Buy together with your tickets — redeem on site',svcdSub:'Choose options and quantity',
+        perTrip:'/tour',perCar:'/car · up to 7 pax',svcFrom:'From'},
+      svc:{
+        audio:{n:'Audio Guide — self-guided tour',d:'Audio device/app · 12 languages',v:{dn:'Imperial City area',lg:'Tombs: Minh Mang · Tu Duc · Khai Dinh'},note:'Pick up at Ngo Mon gate and site entrances'},
+        costume:{n:'Royal costume photoshoot',d:'Photos with performers in royal court costume',v:{v1:'On the Throne — with 2 court maids',v2:'On the Throne — without maids'},note:'At Huu Vu house (Imperial City) · Minh Khiem Duong (Tu Duc tomb)'},
+        guide:{n:'Live tour guide',d:'Professional guide accompanies your visit · per tour',v:{one:''},note:'Book at ticket counters · Tel/Zalo 0326 220 022'},
+        ev:{n:'Hoang Thanh electric car',d:'Shuttle inside the Imperial City · price per car (up to 7 pax)',v:{one:''},note:'Operated by partner Hoang Thanh · west of Thai Hoa Palace'},
+        tech:{n:'Tech experiences (AR/XR)',d:'Simulator · XR tour · Dau Ho game (AR Photo Kiosk 70–300k at counter)',v:{sim:'Simulator',xr:'XR Tour',dauho:'Dau Ho game'},note:'Experience zone inside the Imperial City'}},
+      rows:{dom:'Domestic visitor',int:'International visitor',adt:'Adult',chd:'Child',
+        kieu:'Add-on — on the Palanquin',xekeo:'Add-on — on the Rickshaw',
+        gdn:'Imperial City (Dai Noi)',glg:'One of 3 tombs: Tu Duc · Khai Dinh · Minh Mang',
+        r90:'Imperial City tour — 90 min',r60:'Imperial City tour — 60 min',tm:'The Mieu / Dien Tho – Nguyen Hoang station',vq:'Around the Citadel (non-stop)',kt:'Kien Trung Palace – Nguyen Hoang station',dtd:'Duyet Thi Duong Theater – station',btm:'Imperial City – Antiquities Museum',p45:'Station pick-up + 45-min tour',p60:'Station pick-up + 60-min tour',
+        vna:'Vietnamese — adult',vnc:'Vietnamese — child',fa:'International — adult',fc:'International — child',all:'All visitors'}},
+    zh:{ui:{t3h:'体验及配套服务',t3p:'语音导览 · 宫廷服饰摄影 · 真人讲解 · 电瓶车 · AR/XR',
+        svcTitle:'体验服务',svcSub:'可与门票一同购买 — 到点核销',svcdSub:'选择项目与数量',
+        perTrip:'/次',perCar:'/车 · 最多7人',svcFrom:'低至'},
+      svc:{
+        audio:{n:'Audio Guide 语音导览',d:'自助讲解设备/应用 · 支持12种语言',v:{dn:'大内区域',lg:'皇陵：明命 · 嗣德 · 启定'},note:'在午门及各景点入口领取设备'},
+        costume:{n:'宫廷服饰摄影',d:'身着宫廷服饰，与演员合影留念',v:{v1:'坐龙椅 — 含2名宫女',v2:'坐龙椅 — 不含宫女'},note:'右庑（大内）· 明谦堂（嗣德陵）'},
+        guide:{n:'真人讲解服务',d:'专业讲解员随行 · 按次预订',v:{one:''},note:'售票点预订 · Tel/Zalo 0326 220 022'},
+        ev:{n:'皇城电瓶车',d:'大内景区内接驳 · 按车计价（最多7人）',v:{one:''},note:'合作方 Hoang Thanh 运营 · 太和殿西侧'},
+        tech:{n:'科技体验（AR/XR）',d:'飞行模拟 · XR体验 · 投壶游戏（AR拍照亭 70–300k 柜台购买）',v:{sim:'飞行模拟（Simulator）',xr:'XR 体验',dauho:'投壶游戏'},note:'大内园区体验区'}},
+      rows:{dom:'越南游客',int:'国际游客',adt:'成人',chd:'儿童',
+        kieu:'加拍 — 坐轿',xekeo:'加拍 — 人力车',
+        gdn:'大内皇城',glg:'三座皇陵之一：嗣德 · 启定 · 明命',
+        r90:'大内游览 90分钟',r60:'大内游览 60分钟',tm:'世庙/延寿宫 – 阮潢车站',vq:'环皇城一周（不停车）',kt:'建中殿 – 阮潢车站',dtd:'阅是堂剧院 – 车站',btm:'大内 – 古物博物馆',p45:'车站接送 + 45分钟游览',p60:'车站接送 + 60分钟游览',
+        vna:'越南 — 成人',vnc:'越南 — 儿童',fa:'国际 — 成人',fc:'国际 — 儿童',all:'通用票'}}
+  };
 
   /* ---------- i18n ---------- */
   var I18N={
@@ -718,8 +838,11 @@
   });
 
   /* ---------- helpers ---------- */
-  var state={scr:'attract',lang:'vi',mode:'diem',pick:null,qa:1,qc:0,cart:[],order:null};
-  function T(k){return I18N[state.lang][k];}
+  var state={scr:'attract',lang:'vi',mode:'diem',pick:null,qa:1,qc:0,cart:[],order:null,
+    svcPick:null,svcVar:null,svcQty:{}};
+  function T(k){var v=I18N[state.lang][k];if(v===undefined)v=SVCTXT[state.lang].ui[k];return v;}
+  function ST(){return SVCTXT[state.lang];}
+  function svcRowLabel(rid){return ST().rows[rid];}
   function nm(d){return d[state.lang]||d.vi;}
   function sec(d){return state.lang==='vi'?d.en:d.vi;}
   function vnd(n){return n===0?T('free'):n.toLocaleString('vi-VN')+'đ';}
@@ -759,6 +882,8 @@
     /* re-render dynamic content of current screen */
     if(state.scr==='list')renderList();
     if(state.scr==='qty')renderQty();
+    if(state.scr==='svc')renderSvc();
+    if(state.scr==='svcd')renderSvcd();
     if(state.scr==='cart')renderCart();
     if(state.scr==='pay')document.getElementById('payTotal').textContent=vndZ(cartTotal());
     if(state.scr==='success')renderSuccess();
@@ -772,7 +897,7 @@
   });
 
   /* ---------- steppers ---------- */
-  var STEPMAP={type:1,list:1,qty:2,cart:2,pay:3,payqr:3,success:4};
+  var STEPMAP={type:1,list:1,svc:1,qty:2,svcd:2,cart:2,pay:3,payqr:3,success:4};
   function buildSteppers(){
     var labels=T('steps');
     document.querySelectorAll('.kstep').forEach(function(el){
@@ -796,17 +921,21 @@
     type:'<b>Rẽ nhánh đầu tiên</b> theo bảng giá hiện hành: vé điểm lẻ (13 điểm) hoặc vé tuyến combo (8 tuyến). Nút chạm cao ≥80&nbsp;px thực (~20&nbsp;mm) — chuẩn ngón tay cái.',
     list:'<b>Lưới chọn điểm.</b> Tên di tích hiển thị theo ngôn ngữ đã chọn (bản dịch Anh/Trung chuẩn địa danh). Giá người lớn/trẻ em hiện ngay trên thẻ, danh sách cuộn dọc.',
     qty:'<b>Bộ đếm số lượng</b> với nút ± cỡ 40&nbsp;px (~15&nbsp;mm). Quy tắc trẻ em (7–12 tuổi giảm/miễn phí) tự áp theo điểm, khách không phải tự tính.',
-    cart:'<b>Giỏ vé.</b> Xem lại, sửa số lượng hoặc xoá từng dòng, mua gộp nhiều điểm trong một lần trả tiền.',
+    svc:'<b>5 nhóm dịch vụ đi kèm:</b> Audio Guide (12 ngôn ngữ) · chụp ảnh trang phục cung đình · thuyết minh HDV · xe điện Hoàng Thành (đối tác) · AR/XR. Mua gộp cùng vé cổng trong 1 đơn.',
+    svcd:'<b>Cấu trúc giá giữ nguyên bản gốc từng dịch vụ:</b> Audio Guide & AR/XR tách khách trong nước/quốc tế (hỏi đúng tại đây, không tách luồng); chụp ảnh cổ phục có 2 biến thể + 2 add-on (Kiệu/Xe kéo); xe điện tính theo xe tối đa 7 khách.',
+    cart:'<b>Giỏ vé.</b> Xem lại, sửa số lượng hoặc xoá từng dòng, mua gộp vé cổng + dịch vụ trong một lần trả tiền.',
     pay:'<b>Không dùng tiền mặt.</b> VietQR phủ mọi ngân hàng và ví trong nước; đầu đọc thẻ NAPAS/EMV phục vụ khách dùng thẻ quốc tế — cả 2 luôn hiển thị.',
     payqr:'<b>Màn quét QR</b> có đồng hồ đếm ngược 2 phút và nút huỷ rõ ràng. Khi cổng thanh toán báo về (webhook), máy tự nhảy sang màn nhận vé — khách không phải bấm gì.',
     success:'<b>Xuất vé 2 cách:</b> QR hiển thị ngay trên màn (chụp lại bằng điện thoại) hoặc in vé nhiệt 80&nbsp;mm — mỗi vé một mã riêng để soát tại cổng. Tự về màn hình chờ sau 60&nbsp;giây.'
   };
   var RAIL=[
     ['attract','Màn hình chờ','chạm để bắt đầu · VI/EN/中文'],
-    ['type','Chọn loại vé','vé điểm lẻ / vé tuyến combo'],
+    ['type','Chọn loại vé','điểm lẻ / tuyến combo / dịch vụ'],
     ['list','Chọn điểm / tuyến','13 điểm · 8 tuyến, tên theo ngôn ngữ'],
     ['qty','Số lượng vé','người lớn / trẻ em 7–12'],
-    ['cart','Giỏ vé','gộp nhiều điểm · sửa / xoá'],
+    ['svc','Dịch vụ đi kèm','audio · cổ phục · HDV · xe điện · AR/XR'],
+    ['svcd','Chi tiết dịch vụ','biến thể + hạng khách + add-on'],
+    ['cart','Giỏ vé','gộp vé + dịch vụ · sửa / xoá'],
     ['pay','Phương thức','VietQR · thẻ NAPAS/EMV'],
     ['payqr','Quét mã QR','countdown 2 phút · tự xác nhận'],
     ['success','Nhận vé','QR màn hình + in nhiệt 80mm']
@@ -834,6 +963,8 @@
   function go(scr){
     if(scr==='list')renderList();
     if(scr==='qty')renderQty();
+    if(scr==='svc')renderSvc();
+    if(scr==='svcd')renderSvcd();
     if(scr==='cart')renderCart();
     if(scr==='pay')document.getElementById('payTotal').textContent=vndZ(cartTotal());
     if(scr==='payqr')renderPayQR();
@@ -841,14 +972,16 @@
   }
   function resetAll(){
     state.pick=null;state.qa=1;state.qc=0;state.cart=[];state.order=null;
+    state.svcPick=null;state.svcVar=null;state.svcQty={};
     document.getElementById('printOv').classList.remove('active');
     show('attract');
   }
   function jumpTo(scr){
     if(scr==='attract'){resetAll();return;}
     if((scr==='qty')&&!state.pick){state.pick='dn';state.qa=2;state.qc=1;}
+    if(scr==='svcd'&&!state.svcPick){state.svcPick='audio';state.svcVar='dn';state.svcQty={'dn|dom':1,'dn|int':1};}
     if(['cart','pay','payqr','success'].indexOf(scr)>=0&&state.cart.length===0){
-      state.cart=[{id:'dn',a:2,c:1},{id:'t2',a:1,c:0}];
+      state.cart=[{id:'dn',a:2,c:1},{svc:'audio',v:'dn',r:'int',q:2,p:100000}];
     }
     if(scr==='success'&&!state.order)makeOrder();
     if(scr==='success')renderSuccess();
@@ -862,7 +995,10 @@
   });
   document.getElementById('scrAttract').addEventListener('click',function(){go('type');});
   document.querySelectorAll('.type-card').forEach(function(c){
-    c.addEventListener('click',function(){state.mode=c.dataset.mode;go('list');});
+    c.addEventListener('click',function(){
+      if(c.dataset.mode==='svc'){go('svc');return;}
+      state.mode=c.dataset.mode;go('list');
+    });
   });
   document.querySelectorAll('.pay-opt').forEach(function(p){
     p.addEventListener('click',function(){
@@ -919,18 +1055,106 @@
     go('cart');
   });
 
+  /* ---------- services ---------- */
+  function renderSvc(){
+    var list=document.getElementById('svcList');list.innerHTML='';
+    SVC.forEach(function(s){
+      var t=ST().svc[s.id];
+      var b=document.createElement('button');b.className='type-card';b.style.padding='14px 14px';
+      b.innerHTML='<div style="flex:1;min-width:0"><h4 style="font-size:13px">'+t.n+'</h4>'
+        +'<p>'+t.d+'</p>'
+        +'<p style="margin-top:4px;color:var(--k-blue);font-weight:800;font-size:11px">'+T('svcFrom')+' '+vndZ(s.from)+(s.unit?T(s.unit):'')+'</p></div>'
+        +'<span class="arr">›</span>';
+      b.addEventListener('click',function(){
+        state.svcPick=s.id;state.svcVar=s.vars[0].id;state.svcQty={};go('svcd');
+      });
+      list.appendChild(b);
+    });
+    var mini=document.getElementById('toCartFromSvc');
+    mini.style.display=state.cart.length?'block':'none';
+    document.querySelectorAll('.miniCount2').forEach(function(el){el.textContent=state.cart.length;});
+  }
+  function svcActiveRows(){
+    var s=SVCMAP[state.svcPick];if(!s)return [];
+    var v=s.vars.find(function(x){return x.id===state.svcVar;})||s.vars[0];
+    var rows=v.rows.map(function(r){return {v:v.id,r:r.id,p:r.p};});
+    (s.extra||[]).forEach(function(r){rows.push({v:'_x',r:r.id,p:r.p});});
+    return rows;
+  }
+  function renderSvcd(){
+    var s=SVCMAP[state.svcPick];if(!s)return;
+    var t=ST().svc[s.id];
+    document.getElementById('svcdTitle').textContent=t.n;
+    var vc=document.getElementById('svcdVars');vc.innerHTML='';
+    var multi=s.vars.length>1;
+    vc.style.display=multi?'flex':'none';
+    if(multi)s.vars.forEach(function(v){
+      var b=document.createElement('button');b.className='vchip'+(v.id===state.svcVar?' on':'');
+      b.textContent=t.v[v.id];
+      b.addEventListener('click',function(){state.svcVar=v.id;renderSvcd();});
+      vc.appendChild(b);
+    });
+    var box=document.getElementById('svcdRows');box.innerHTML='';
+    var unit=s.unit?T(s.unit):'';
+    svcActiveRows().forEach(function(row){
+      var key=row.v+'|'+row.r,q=state.svcQty[key]||0;
+      var div=document.createElement('div');div.className='qrow';
+      div.innerHTML='<div class="who"><b style="font-size:11px;line-height:1.35">'+svcRowLabel(row.r)+'</b></div>'
+        +'<div class="p">'+vndZ(row.p)+(unit?'<span class="rowp">'+unit+'</span>':'')+'</div>'
+        +'<div class="step-ctl"><button class="sm">−</button><span class="n">'+q+'</span><button class="sp">＋</button></div>';
+      var nEl=div.querySelector('.n');
+      div.querySelector('.sm').disabled=q<=0;
+      div.querySelector('.sp').addEventListener('click',function(){
+        var cur=state.svcQty[key]||0;if(cur<9){state.svcQty[key]=cur+1;}renderSvcd();
+      });
+      div.querySelector('.sm').addEventListener('click',function(){
+        var cur=state.svcQty[key]||0;if(cur>0){state.svcQty[key]=cur-1;}renderSvcd();
+      });
+      box.appendChild(div);
+    });
+    document.getElementById('svcdNote').textContent=t.note||'';
+    var sum=0;
+    svcActiveRows().forEach(function(row){sum+=(state.svcQty[row.v+'|'+row.r]||0)*row.p;});
+    document.getElementById('addSvcSum').textContent=vndZ(sum);
+    document.getElementById('addSvcBtn').disabled=sum===0;
+  }
+  document.getElementById('addSvcBtn').addEventListener('click',function(){
+    var added=false;
+    svcActiveRows().forEach(function(row){
+      var q=state.svcQty[row.v+'|'+row.r]||0;if(!q)return;
+      var ex=state.cart.find(function(l){return l.svc===state.svcPick&&l.v===row.v&&l.r===row.r;});
+      if(ex)ex.q+=q;else state.cart.push({svc:state.svcPick,v:row.v,r:row.r,q:q,p:row.p});
+      added=true;
+    });
+    if(added){state.svcQty={};go('cart');}
+  });
+  function svcLineLabel(l){
+    var s=SVCMAP[l.svc],t=ST().svc[l.svc];
+    var vlbl=(s.vars.length>1&&l.v!=='_x')?(t.v[l.v]+' · '):'';
+    return {name:t.n,sub:vlbl+svcRowLabel(l.r)+' × '+l.q};
+  }
+
   /* ---------- cart ---------- */
   function cartTotal(){
-    return state.cart.reduce(function(s,l){var d=ALL[l.id];return s+l.a*d.a+l.c*d.c;},0);
+    return state.cart.reduce(function(s,l){
+      if(l.svc)return s+l.p*l.q;
+      var d=ALL[l.id];return s+l.a*d.a+l.c*d.c;
+    },0);
   }
   function renderCart(){
     var box=document.getElementById('cartLines');box.innerHTML='';
     state.cart.forEach(function(l,idx){
-      var d=ALL[l.id],sum=l.a*d.a+l.c*d.c;
-      var parts=[];if(l.a)parts.push(l.a+' '+T('lineAdult'));if(l.c)parts.push(l.c+' '+T('lineChild'));
       var div=document.createElement('div');div.className='cline';
-      div.innerHTML='<div class="ci"><b>'+nm(d)+'</b><span>'+parts.join(' · ')+'</span></div>'
-        +'<div class="cp">'+vndZ(sum)+'</div><button class="rm" aria-label="'+T('rmLbl')+'">✕</button>';
+      if(l.svc){
+        var lb=svcLineLabel(l);
+        div.innerHTML='<div class="ci"><b>'+lb.name+'</b><span>'+lb.sub+'</span></div>'
+          +'<div class="cp">'+vndZ(l.p*l.q)+'</div><button class="rm" aria-label="'+T('rmLbl')+'">✕</button>';
+      }else{
+        var d=ALL[l.id],sum=l.a*d.a+l.c*d.c;
+        var parts=[];if(l.a)parts.push(l.a+' '+T('lineAdult'));if(l.c)parts.push(l.c+' '+T('lineChild'));
+        div.innerHTML='<div class="ci"><b>'+nm(d)+'</b><span>'+parts.join(' · ')+'</span></div>'
+          +'<div class="cp">'+vndZ(sum)+'</div><button class="rm" aria-label="'+T('rmLbl')+'">✕</button>';
+      }
       div.querySelector('.rm').addEventListener('click',function(){state.cart.splice(idx,1);renderCart();});
       box.appendChild(div);
     });
@@ -966,6 +1190,12 @@
   function flatTickets(){
     var out=[],n=0;
     state.cart.forEach(function(l){
+      if(l.svc){
+        var s=SVCMAP[l.svc],t=ST().svc[l.svc];
+        var vlbl=(s.vars.length>1&&l.v!=='_x')?(t.v[l.v]+' · '):'';
+        for(var k=0;k<l.q;k++){n++;out.push({name:t.n,type:vlbl+svcRowLabel(l.r)+' · '+vndZ(l.p),code:state.order.ref+'-'+String(n).padStart(2,'0')});}
+        return;
+      }
       var d=ALL[l.id];
       for(var i=0;i<l.a;i++){n++;out.push({name:nm(d),type:T('tikAdult')+' · '+vndZ(d.a),code:state.order.ref+'-'+String(n).padStart(2,'0')});}
       for(var j=0;j<l.c;j++){n++;out.push({name:nm(d),type:T('tikChild')+' · '+vnd(d.c),code:state.order.ref+'-'+String(n).padStart(2,'0')});}
