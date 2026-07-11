@@ -1,0 +1,1032 @@
+<title>Kiosk bán vé — Di tích Cố đô Huế</title>
+<style>
+  /* ---------- page tokens (themed) ---------- */
+  :root{
+    --pg-bg:#EFECEF; --pg-surface:#FAF8FA; --pg-line:#DAD3DB;
+    --pg-ink:#26222B; --pg-soft:#5F5866; --pg-faint:#8F8896;
+    --pg-accent:#63377D; --pg-gold:#B98A22;
+    --pg-shadow:0 18px 50px rgba(52,27,70,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --pg-bg:#17151B; --pg-surface:#211E27; --pg-line:#37323F;
+      --pg-ink:#EAE7EC; --pg-soft:#AFA8B6; --pg-faint:#7D7685;
+      --pg-accent:#C39BDD; --pg-gold:#D8AE55;
+      --pg-shadow:0 18px 50px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --pg-bg:#17151B; --pg-surface:#211E27; --pg-line:#37323F;
+    --pg-ink:#EAE7EC; --pg-soft:#AFA8B6; --pg-faint:#7D7685;
+    --pg-accent:#C39BDD; --pg-gold:#D8AE55;
+    --pg-shadow:0 18px 50px rgba(0,0,0,.5);
+  }
+  :root[data-theme="light"]{
+    --pg-bg:#EFECEF; --pg-surface:#FAF8FA; --pg-line:#DAD3DB;
+    --pg-ink:#26222B; --pg-soft:#5F5866; --pg-faint:#8F8896;
+    --pg-accent:#63377D; --pg-gold:#B98A22;
+    --pg-shadow:0 18px 50px rgba(52,27,70,.18);
+  }
+
+  /* ---------- kiosk fixed palette — tím Huế (deliberately single-world) ---------- */
+  :root{
+    --k-navy:#472759; --k-navy-2:#301640; --k-blue:#6B3F86;
+    --k-paper:#FBF7F2; --k-card:#FFFFFF; --k-line:#E4DBD0;
+    --k-ink:#241B2E; --k-soft:#645A6E; --k-faint:#9C92A6;
+    --k-gold:#E9B949; --k-gold-deep:#C6952B; --k-gold-ink:#3A2C08;
+    --k-green:#2E7D4F; --k-red:#B4452F;
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--pg-bg);color:var(--pg-ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",Arial,sans-serif;
+    font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1200px;margin:0 auto;padding:44px 24px 90px}
+
+  /* ---------- header ---------- */
+  .eyebrow{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--pg-gold);font-weight:700;margin:0 0 10px}
+  h1{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-size:34px;font-weight:600;margin:0;letter-spacing:-.01em;text-wrap:balance}
+  .lede{color:var(--pg-soft);max-width:68ch;margin:12px 0 0;font-size:15px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .chip{font-size:12.5px;font-weight:600;color:var(--pg-soft);background:var(--pg-surface);
+    border:1px solid var(--pg-line);border-radius:999px;padding:5px 13px}
+  .chip b{color:var(--pg-ink);font-variant-numeric:tabular-nums}
+
+  /* ---------- stage ---------- */
+  .stage{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:36px;margin-top:40px;align-items:start}
+  @media(max-width:980px){.stage{grid-template-columns:1fr}}
+
+  /* ---------- kiosk device ---------- */
+  .device-col{display:flex;justify-content:center}
+  .kiosk{width:430px;max-width:100%;background:linear-gradient(178deg,#4C2B60,#341B46 60%,#241030);
+    border-radius:22px;padding:18px 18px 26px;box-shadow:var(--pg-shadow);position:relative}
+  .kiosk-head{display:flex;align-items:center;gap:11px;padding:4px 6px 14px}
+  .kiosk-head .emb{flex:none}
+  .kiosk-head .t1{color:#fff;font-size:11px;font-weight:800;letter-spacing:.05em;line-height:1.35}
+  .kiosk-head .t2{color:var(--k-gold);font-size:12.5px;font-weight:800;letter-spacing:.14em}
+
+  .screen{position:relative;width:100%;aspect-ratio:9/16;background:var(--k-paper);
+    border-radius:10px;overflow:hidden;border:3px solid #1B0D26}
+
+  .kiosk-below{margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:14px}
+  .slot{width:64%;text-align:center}
+  .slot-line{height:9px;border-radius:999px;background:#1B0D26;box-shadow:inset 0 2px 5px rgba(0,0,0,.8);margin-bottom:7px}
+  .slot span{font-size:9.5px;letter-spacing:.2em;color:#9A83B0;font-weight:700}
+
+  /* ---------- screens ---------- */
+  .scr{position:absolute;inset:0;display:none;flex-direction:column;background:var(--k-paper);color:var(--k-ink)}
+  .scr.active{display:flex}
+  .scr *{font-family:inherit}
+
+  /* attract */
+  .scr-attract{background:radial-gradient(120% 90% at 50% -10%,#5E3975 0%,#3E2052 48%,#241030 100%);
+    color:#fff;align-items:center;justify-content:center;text-align:center;padding:28px;cursor:pointer}
+  .scr-attract .big-emb{margin-bottom:22px}
+  .scr-attract h2{font-family:Georgia,serif;font-size:23px;font-weight:600;margin:0 0 6px;color:#fff;text-wrap:balance}
+  .scr-attract .sub{color:#D6C6E6;font-size:12.5px;margin:0 0 34px}
+  .tap-cta{background:var(--k-gold);color:var(--k-gold-ink);font-weight:800;font-size:15px;
+    border:none;border-radius:999px;padding:16px 34px;cursor:pointer;animation:pulse 2.4s ease-in-out infinite}
+  .tap-cta small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;opacity:.75}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+  @media(prefers-reduced-motion:reduce){.tap-cta{animation:none}.receipt{transition:none!important}}
+  .langs{display:flex;gap:10px;margin-top:30px}
+  .lang{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);color:#fff;
+    font-size:12px;font-weight:700;border-radius:999px;padding:8px 16px;cursor:pointer}
+  .lang.on{background:var(--k-gold);border-color:var(--k-gold);color:var(--k-gold-ink)}
+  .attract-foot{position:absolute;bottom:16px;left:0;right:0;font-size:9.5px;color:#A791BD;letter-spacing:.1em}
+
+  /* header inside flow screens */
+  .khead{background:var(--k-navy);color:#fff;padding:10px 14px;display:flex;align-items:center;gap:10px;flex:none}
+  .khead .hlogo{flex:none}
+  .khead .htxt{font-size:9px;font-weight:800;letter-spacing:.04em;line-height:1.3;color:#E4D8EE}
+  .khead .htxt b{display:block;color:var(--k-gold);font-size:10px;letter-spacing:.12em}
+  .khead .hlang{margin-left:auto;display:flex;gap:5px}
+  .khead .hlang button{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:#E4D8EE;
+    font-size:9px;font-weight:800;border-radius:6px;padding:5px 7px;cursor:pointer}
+  .khead .hlang button.on{background:var(--k-gold);border-color:var(--k-gold);color:var(--k-gold-ink)}
+  .khead .hcancel{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);
+    color:#fff;font-size:10.5px;font-weight:700;border-radius:8px;padding:7px 12px;cursor:pointer}
+
+  /* stepper */
+  .kstep{display:flex;gap:0;flex:none;background:#fff;border-bottom:1px solid var(--k-line);padding:10px 12px}
+  .ks{flex:1;text-align:center;position:relative}
+  .ks .dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--k-line);background:#fff;
+    color:var(--k-faint);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 3px;
+    font-variant-numeric:tabular-nums}
+  .ks .lbl{font-size:8.5px;font-weight:700;color:var(--k-faint);letter-spacing:.02em}
+  .ks::before{content:"";position:absolute;top:12px;left:-50%;width:100%;height:2px;background:var(--k-line);z-index:0}
+  .ks:first-child::before{display:none}
+  .ks.done .dot,.ks.now .dot{border-color:var(--k-gold-deep);background:var(--k-gold);color:var(--k-gold-ink)}
+  .ks.now .lbl{color:var(--k-ink)}
+  .ks.done::before,.ks.now::before{background:var(--k-gold-deep)}
+
+  .kbody{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+  .kbody::-webkit-scrollbar{width:4px}
+  .kbody::-webkit-scrollbar-thumb{background:var(--k-line);border-radius:2px}
+  .ktitle{font-size:16px;font-weight:800;margin:2px 0 0;color:var(--k-ink);text-align:center}
+  .ksub{font-size:10.5px;color:var(--k-soft);text-align:center;margin:0 0 4px}
+
+  .kfoot{flex:none;padding:12px 14px 16px;background:linear-gradient(180deg,rgba(251,247,242,0),var(--k-paper) 35%);display:flex;gap:10px}
+  .btn{flex:1;border:none;border-radius:12px;font-size:14.5px;font-weight:800;padding:16px 10px;cursor:pointer;min-height:52px}
+  .btn small{display:block;font-size:9.5px;font-weight:700;opacity:.7;letter-spacing:.05em}
+  .btn-gold{background:var(--k-gold);color:var(--k-gold-ink);box-shadow:0 3px 0 var(--k-gold-deep)}
+  .btn-gold:disabled{opacity:.4;cursor:default;box-shadow:none}
+  .btn-ghost{background:#fff;color:var(--k-soft);border:1.5px solid var(--k-line);flex:0 0 32%}
+
+  /* type choice */
+  .type-card{background:var(--k-card);border:2px solid var(--k-line);border-radius:16px;padding:20px 16px;
+    display:flex;align-items:center;gap:14px;cursor:pointer;text-align:left}
+  .type-card:hover{border-color:var(--k-gold-deep)}
+  .type-card .ic{flex:none;width:52px;height:52px;border-radius:14px;background:var(--k-navy);
+    display:flex;align-items:center;justify-content:center}
+  .type-card h4{margin:0;font-size:15px;font-weight:800;color:var(--k-ink)}
+  .type-card p{margin:3px 0 0;font-size:10.5px;color:var(--k-soft)}
+  .type-card .arr{margin-left:auto;color:var(--k-gold-deep);font-size:20px;font-weight:800}
+
+  /* site grid */
+  .site-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .site{background:var(--k-card);border:2px solid var(--k-line);border-radius:12px;padding:11px 11px 10px;cursor:pointer;text-align:left;position:relative}
+  .site:hover{border-color:var(--k-gold-deep)}
+  .site h5{margin:0 0 5px;font-size:11.5px;font-weight:800;color:var(--k-ink);line-height:1.35;min-height:30px}
+  .site .pr{font-size:12.5px;font-weight:800;color:var(--k-blue);font-variant-numeric:tabular-nums}
+  .site .pc{font-size:9px;color:var(--k-soft);margin-top:1px}
+  .site .pc b{color:var(--k-green)}
+  .route{grid-column:1/-1;display:flex;align-items:center;gap:10px}
+  .route h5{min-height:0;flex:1}
+  .route .rp{text-align:right;flex:none}
+
+  /* qty */
+  .qty-item{background:var(--k-card);border:2px solid var(--k-line);border-radius:14px;padding:14px}
+  .qty-item .nm{font-size:13.5px;font-weight:800;margin-bottom:2px}
+  .qty-item .en{font-size:10px;color:var(--k-faint);margin-bottom:12px}
+  .qrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--k-line)}
+  .qrow .who{flex:1}
+  .qrow .who b{font-size:12.5px;display:block}
+  .qrow .who span{font-size:9.5px;color:var(--k-soft)}
+  .qrow .p{font-size:12px;font-weight:800;color:var(--k-blue);width:74px;text-align:right;font-variant-numeric:tabular-nums}
+  .qrow .p.free{color:var(--k-green)}
+  .step-ctl{display:flex;align-items:center;gap:8px}
+  .step-ctl button{width:40px;height:40px;border-radius:10px;border:2px solid var(--k-line);background:#fff;
+    font-size:19px;font-weight:800;color:var(--k-ink);cursor:pointer;line-height:1}
+  .step-ctl button:disabled{opacity:.3;cursor:default}
+  .step-ctl .n{width:26px;text-align:center;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+
+  /* cart */
+  .cline{background:var(--k-card);border:1.5px solid var(--k-line);border-radius:12px;padding:11px 12px;display:flex;gap:10px;align-items:center}
+  .cline .ci{flex:1}
+  .cline .ci b{font-size:12px;display:block;line-height:1.35}
+  .cline .ci span{font-size:9.5px;color:var(--k-soft)}
+  .cline .cp{font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums;text-align:right}
+  .cline .rm{border:none;background:none;color:var(--k-red);font-size:10px;font-weight:700;cursor:pointer;padding:4px}
+  .total-bar{background:var(--k-navy);color:#fff;border-radius:12px;padding:13px 15px;display:flex;align-items:baseline;gap:8px;margin-top:2px}
+  .total-bar .tl{font-size:11px;font-weight:700;color:#D0BFE2}
+  .total-bar .tv{margin-left:auto;font-size:19px;font-weight:800;color:var(--k-gold);font-variant-numeric:tabular-nums}
+  .add-more{border:2px dashed var(--k-line);background:none;border-radius:12px;padding:11px;font-size:11.5px;font-weight:700;color:var(--k-soft);cursor:pointer}
+
+  /* pay */
+  .pay-opt{background:var(--k-card);border:2px solid var(--k-line);border-radius:14px;padding:15px;display:flex;gap:12px;align-items:center;cursor:pointer;text-align:left}
+  .pay-opt.on{border-color:var(--k-gold-deep);background:#FFFBEE}
+  .pay-opt .pic{flex:none;width:44px;height:44px;border-radius:11px;background:var(--k-navy);display:flex;align-items:center;justify-content:center}
+  .pay-opt h4{margin:0;font-size:13.5px;font-weight:800}
+  .pay-opt p{margin:2px 0 0;font-size:10px;color:var(--k-soft)}
+  .pay-opt .rad{margin-left:auto;width:20px;height:20px;border-radius:50%;border:2.5px solid var(--k-line);flex:none}
+  .pay-opt.on .rad{border-color:var(--k-gold-deep);background:radial-gradient(circle at center,var(--k-gold-deep) 45%,transparent 50%)}
+
+  /* pay QR */
+  .qr-holder{background:#fff;border:2px solid var(--k-line);border-radius:16px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .qr-holder canvas{width:168px;height:168px;image-rendering:pixelated}
+  .qr-amt{font-size:19px;font-weight:800;color:var(--k-navy);font-variant-numeric:tabular-nums}
+  .qr-meta{font-size:9.5px;color:var(--k-soft);text-align:center}
+  .countdown{display:flex;align-items:center;gap:7px;justify-content:center;font-size:11px;color:var(--k-soft);font-weight:700}
+  .countdown b{color:var(--k-red);font-variant-numeric:tabular-nums;font-size:13px}
+  .demo-pay{background:none;border:1.5px dashed var(--k-faint);color:var(--k-faint);font-size:9.5px;border-radius:8px;padding:7px 10px;cursor:pointer;margin:0 auto}
+
+  /* success */
+  .done-band{background:var(--k-green);color:#fff;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:10px}
+  .done-band b{font-size:14px}
+  .done-band span{font-size:10px;opacity:.85;display:block}
+  .tickets{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 8px;scroll-snap-type:x mandatory}
+  .tik{flex:0 0 172px;scroll-snap-align:center;background:#fff;border:2px solid var(--k-line);border-radius:14px;padding:13px 12px;text-align:center}
+  .tik canvas{width:118px;height:118px;image-rendering:pixelated}
+  .tik .tn{font-size:10.5px;font-weight:800;line-height:1.3;min-height:28px;display:flex;align-items:center;justify-content:center}
+  .tik .tt{font-size:9px;color:var(--k-soft)}
+  .tik .tc{font-size:9px;font-weight:700;color:var(--k-blue);letter-spacing:.06em;margin-top:5px;font-variant-numeric:tabular-nums}
+  .succ-note{font-size:9.5px;color:var(--k-soft);text-align:center}
+
+  /* print overlay */
+  .print-ov{position:absolute;inset:0;background:rgba(28,13,40,.92);display:none;flex-direction:column;align-items:center;padding:34px 22px;z-index:5}
+  .print-ov.active{display:flex}
+  .pslot{width:200px;height:10px;background:#000;border-radius:999px;box-shadow:inset 0 2px 6px #000, 0 1px 0 rgba(255,255,255,.15);margin-bottom:0;z-index:2}
+  .receipt-clip{width:172px;overflow:hidden;display:flex;justify-content:center}
+  .receipt{width:160px;background:#fff;border-radius:0 0 8px 8px;padding:12px 10px 14px;text-align:center;
+    transform:translateY(-102%);transition:transform 2s cubic-bezier(.25,.8,.35,1);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .receipt.out{transform:translateY(0)}
+  .receipt .rh{font-size:8px;font-weight:800;letter-spacing:.04em;color:var(--k-navy);line-height:1.4}
+  .receipt .rg{color:var(--k-gold-deep);font-size:8.5px;letter-spacing:.1em;font-weight:800}
+  .receipt hr{border:none;border-top:1.5px dashed #C9C4B4;margin:8px 0}
+  .receipt .rn{font-size:10px;font-weight:800;color:#241B2E}
+  .receipt .rt{font-size:8px;color:#645A6E;margin:2px 0 6px}
+  .receipt canvas{width:96px;height:96px;image-rendering:pixelated}
+  .receipt .rc{font-size:8px;font-weight:700;letter-spacing:.08em;color:#6B3F86;margin-top:4px;font-variant-numeric:tabular-nums}
+  .print-msg{color:#fff;font-size:12px;font-weight:700;margin-top:22px;text-align:center}
+  .print-msg small{display:block;font-size:9.5px;color:#C3AEDA;font-weight:600;margin-top:3px}
+  .print-done-btn{margin-top:18px;background:var(--k-gold);color:var(--k-gold-ink);border:none;border-radius:999px;
+    font-size:12px;font-weight:800;padding:12px 26px;cursor:pointer}
+
+  /* ---------- right rail ---------- */
+  .rail{display:flex;flex-direction:column;gap:22px}
+  .rail h3{font-family:Georgia,serif;font-size:16px;font-weight:600;margin:0 0 10px;color:var(--pg-ink)}
+  .steps{display:flex;flex-direction:column;gap:5px}
+  .stp{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:10px;border:1px solid transparent;
+    background:none;cursor:pointer;text-align:left;font-family:inherit}
+  .stp .no{flex:none;width:24px;height:24px;border-radius:50%;background:var(--pg-surface);border:1.5px solid var(--pg-line);
+    color:var(--pg-faint);font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+  .stp .st{font-size:13px;font-weight:600;color:var(--pg-soft)}
+  .stp .st small{display:block;font-size:10.5px;font-weight:500;color:var(--pg-faint)}
+  .stp:hover{border-color:var(--pg-line);background:var(--pg-surface)}
+  .stp.on{background:var(--pg-surface);border-color:var(--pg-gold)}
+  .stp.on .no{background:var(--pg-gold);border-color:var(--pg-gold);color:#fff}
+  .stp.on .st{color:var(--pg-ink)}
+  .note-box{background:var(--pg-surface);border:1px solid var(--pg-line);border-left:3px solid var(--pg-gold);
+    border-radius:0 10px 10px 0;padding:14px 16px;font-size:13px;color:var(--pg-soft);min-height:88px}
+  .note-box b{color:var(--pg-ink)}
+  .hw-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:0;font-size:13px}
+  .hw-list li{display:flex;justify-content:space-between;gap:14px;padding:8px 2px;border-bottom:1px solid var(--pg-line);color:var(--pg-soft)}
+  .hw-list li b{color:var(--pg-ink);text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+  .elev{background:var(--pg-surface);border:1px solid var(--pg-line);border-radius:12px;padding:16px}
+  .elev svg{display:block;margin:0 auto}
+  .elev .cap{font-size:11px;color:var(--pg-faint);text-align:center;margin-top:8px}
+
+  footer.pg-foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--pg-line);
+    font-size:12.5px;color:var(--pg-faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+  button:focus-visible,.site:focus-visible,.type-card:focus-visible{outline:3px solid var(--k-blue);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Concept UI · Bản demo lấy ý kiến</p>
+    <h1>Kiosk bán vé tự phục vụ — toàn trình chọn vé → thanh toán → xuất vé</h1>
+    <p class="lede">Prototype tương tác cho kiosk cảm ứng bán vé tham quan, tông tím Huế. Chạm trực tiếp vào màn hình mô phỏng để đi hết luồng mua vé, hoặc nhảy nhanh giữa các bước bằng thanh bên phải. Bộ chọn ngôn ngữ hoạt động thật: <b>Tiếng Việt / English / 中文</b> — toàn bộ giao diện, tên di tích và vé in đổi theo.</p>
+    <div class="chips">
+      <span class="chip">Khung máy <b>600 × 500 × 1700 mm</b></span>
+      <span class="chip">Màn cảm ứng dọc <b>27–32″ · 1080×1920</b></span>
+      <span class="chip">In nhiệt <b>khổ 80 mm</b></span>
+      <span class="chip">Thanh toán <b>VietQR / NAPAS</b></span>
+      <span class="chip">Ngôn ngữ <b>VI · EN · 中文</b></span>
+    </div>
+  </header>
+
+  <div class="stage">
+    <!-- ================= KIOSK ================= -->
+    <div class="device-col">
+      <div class="kiosk">
+        <div class="kiosk-head">
+          <span class="emb" id="embSmall"></span>
+          <div>
+            <div class="t1">TRUNG TÂM BẢO TỒN DI TÍCH CỐ ĐÔ HUẾ</div>
+            <div class="t2">VÉ THAM QUAN DI TÍCH</div>
+          </div>
+        </div>
+
+        <div class="screen" id="screen">
+
+          <!-- S0 attract -->
+          <section class="scr scr-attract" data-scr="attract" id="scrAttract">
+            <span class="big-emb" id="embBig"></span>
+            <h2 data-i18n="attractTitle"></h2>
+            <p class="sub" data-i18n="attractSub"></p>
+            <button class="tap-cta" data-go="type"><span data-i18n="cta"></span><small data-i18n="ctaSmall"></small></button>
+            <div class="langs">
+              <button class="lang" data-lang="vi">Tiếng Việt</button>
+              <button class="lang" data-lang="en">English</button>
+              <button class="lang" data-lang="zh">中文</button>
+            </div>
+            <p class="attract-foot" data-i18n="foot"></p>
+          </section>
+
+          <!-- S1 type -->
+          <section class="scr" data-scr="type">
+            <div class="khead">
+              <span class="hlogo" data-emb></span>
+              <div class="htxt">TRUNG TÂM BẢO TỒN DI TÍCH CỐ ĐÔ HUẾ<b>VÉ THAM QUAN DI TÍCH</b></div>
+              <div class="hlang" data-hlang></div>
+              <button class="hcancel" data-reset data-i18n="cancel"></button>
+            </div>
+            <div class="kstep" data-step="1"></div>
+            <div class="kbody">
+              <h3 class="ktitle" data-i18n="typeTitle"></h3>
+              <p class="ksub" data-i18n="typeSub"></p>
+              <button class="type-card" data-mode="diem">
+                <span class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M4 20h16M6 20V10l6-5 6 5v10M10 20v-5h4v5" stroke="#E9B949" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <div><h4 data-i18n="t1h"></h4><p data-i18n="t1p"></p></div>
+                <span class="arr">›</span>
+              </button>
+              <button class="type-card" data-mode="tuyen">
+                <span class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="#E9B949" stroke-width="1.8"/><circle cx="18" cy="18" r="2.4" stroke="#E9B949" stroke-width="1.8"/><path d="M7.8 7.8c3 3 5.4 3.4 8.4 8.4" stroke="#E9B949" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="1 3.4"/></svg></span>
+                <div><h4 data-i18n="t2h"></h4><p data-i18n="t2p"></p></div>
+                <span class="arr">›</span>
+              </button>
+              <p class="ksub" style="margin-top:8px" data-i18n="childNote"></p>
+            </div>
+          </section>
+
+          <!-- S2 list -->
+          <section class="scr" data-scr="list">
+            <div class="khead">
+              <span class="hlogo" data-emb></span>
+              <div class="htxt">TRUNG TÂM BẢO TỒN DI TÍCH CỐ ĐÔ HUẾ<b>VÉ THAM QUAN DI TÍCH</b></div>
+              <div class="hlang" data-hlang></div>
+              <button class="hcancel" data-reset data-i18n="cancel"></button>
+            </div>
+            <div class="kstep" data-step="1"></div>
+            <div class="kbody">
+              <h3 class="ktitle" id="listTitle"></h3>
+              <p class="ksub" id="listSub"></p>
+              <div class="site-grid" id="siteGrid"></div>
+            </div>
+            <div class="kfoot">
+              <button class="btn btn-ghost" data-go="type" data-i18n="back"></button>
+              <button class="btn btn-gold" id="toCartFromList" data-go="cart" style="display:none"><span data-i18n="cartBtn"></span> (<span id="miniCount">0</span>) ›</button>
+            </div>
+          </section>
+
+          <!-- S3 qty -->
+          <section class="scr" data-scr="qty">
+            <div class="khead">
+              <span class="hlogo" data-emb></span>
+              <div class="htxt">TRUNG TÂM BẢO TỒN DI TÍCH CỐ ĐÔ HUẾ<b>VÉ THAM QUAN DI TÍCH</b></div>
+              <div class="hlang" data-hlang></div>
+              <button class="hcancel" data-reset data-i18n="cancel"></button>
+            </div>
+            <div class="kstep" data-step="2"></div>
+            <div class="kbody">
+              <h3 class="ktitle" data-i18n="qtyTitle"></h3>
+              <p class="ksub" data-i18n="qtySub"></p>
+              <div class="qty-item" id="qtyCard"></div>
+            </div>
+            <div class="kfoot">
+              <button class="btn btn-ghost" data-go="list" data-i18n="back"></button>
+              <button class="btn btn-gold" id="addBtn"><span data-i18n="addBtn"></span><small id="addSum">0đ</small></button>
+            </div>
+          </section>
+
+          <!-- S4 cart -->
+          <section class="scr" data-scr="cart">
+            <div class="khead">
+              <span class="hlogo" data-emb></span>
+              <div class="htxt">TRUNG TÂM BẢO TỒN DI TÍCH CỐ ĐÔ HUẾ<b>VÉ THAM QUAN DI TÍCH</b></div>
+              <div class="hlang" data-hlang></div>
+              <button class="hcancel" data-reset data-i18n="cancel"></button>
+            </div>
+            <div class="kstep" data-step="2"></div>
+            <div class="kbody">
+              <h3 class="ktitle" data-i18n="cartTitle"></h3>
+              <p class="ksub" data-i18n="cartSub"></p>
+              <div id="cartLines" style="display:flex;flex-direction:column;gap:8px"></div>
+              <button class="add-more" data-go="type" data-i18n="addMore"></button>
+              <div class="total-bar"><span class="tl" data-i18n="total"></span><span class="tv" id="cartTotal">0đ</span></div>
+            </div>
+            <div class="kfoot">
+              <button class="btn btn-ghost" data-go="list" data-i18n="back"></button>
+              <button class="btn btn-gold" id="toPay" data-go="pay"><span data-i18n="payBtn"></span><small data-i18n="payBtnSmall"></small></button>
+            </div>
+          </section>
+
+          <!-- S5 pay method -->
+          <section class="scr" data-scr="pay">
+            <div class="khead">
+              <span class="hlogo" data-emb></span>
+              <div class="htxt">TRUNG TÂM BẢO TỒN DI TÍCH CỐ ĐÔ HUẾ<b>VÉ THAM QUAN DI TÍCH</b></div>
+              <div class="hlang" data-hlang></div>
+              <button class="hcancel" data-reset data-i18n="cancel"></button>
+            </div>
+            <div class="kstep" data-step="3"></div>
+            <div class="kbody">
+              <h3 class="ktitle" data-i18n="payTitle"></h3>
+              <p class="ksub" data-i18n="paySub"></p>
+              <button class="pay-opt on" data-pm="vietqr">
+                <span class="pic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.4" stroke="#E9B949" stroke-width="1.7"/><rect x="14" y="3" width="7" height="7" rx="1.4" stroke="#E9B949" stroke-width="1.7"/><rect x="3" y="14" width="7" height="7" rx="1.4" stroke="#E9B949" stroke-width="1.7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z" fill="#E9B949"/></svg></span>
+                <div><h4 data-i18n="o1h"></h4><p data-i18n="o1p"></p></div>
+                <span class="rad"></span>
+              </button>
+              <button class="pay-opt" data-pm="card">
+                <span class="pic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="5" width="19" height="14" rx="2.2" stroke="#E9B949" stroke-width="1.7"/><path d="M2.5 9.5h19" stroke="#E9B949" stroke-width="1.7"/><path d="M6 15h5" stroke="#E9B949" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+                <div><h4 data-i18n="o2h"></h4><p data-i18n="o2p"></p></div>
+                <span class="rad"></span>
+              </button>
+              <div class="total-bar"><span class="tl" data-i18n="amount"></span><span class="tv" id="payTotal">0đ</span></div>
+            </div>
+            <div class="kfoot">
+              <button class="btn btn-ghost" data-go="cart" data-i18n="back"></button>
+              <button class="btn btn-gold" data-go="payqr"><span data-i18n="confirm"></span><small data-i18n="confirmSmall"></small></button>
+            </div>
+          </section>
+
+          <!-- S6 pay QR -->
+          <section class="scr" data-scr="payqr">
+            <div class="khead">
+              <span class="hlogo" data-emb></span>
+              <div class="htxt">TRUNG TÂM BẢO TỒN DI TÍCH CỐ ĐÔ HUẾ<b>VÉ THAM QUAN DI TÍCH</b></div>
+              <div class="hlang" data-hlang></div>
+              <button class="hcancel" data-reset data-i18n="cancel"></button>
+            </div>
+            <div class="kstep" data-step="3"></div>
+            <div class="kbody" style="align-items:center">
+              <h3 class="ktitle" data-i18n="payqrTitle"></h3>
+              <p class="ksub" data-i18n="payqrSub"></p>
+              <div class="qr-holder">
+                <canvas id="payQrCanvas" width="232" height="232"></canvas>
+                <div class="qr-amt" id="payQrAmt">0đ</div>
+                <div class="qr-meta">TT BẢO TỒN DI TÍCH CỐ ĐÔ HUẾ<br><span data-i18n="refLbl"></span> <b id="payRef">HUE······</b></div>
+              </div>
+              <div class="countdown"><span data-i18n="expire"></span> <b id="cd">02:00</b></div>
+              <button class="demo-pay" id="demoPay" data-i18n="demoPay"></button>
+            </div>
+            <div class="kfoot">
+              <button class="btn btn-ghost" data-go="pay" data-i18n="changePm"></button>
+            </div>
+          </section>
+
+          <!-- S7 success -->
+          <section class="scr" data-scr="success">
+            <div class="khead">
+              <span class="hlogo" data-emb></span>
+              <div class="htxt">TRUNG TÂM BẢO TỒN DI TÍCH CỐ ĐÔ HUẾ<b>VÉ THAM QUAN DI TÍCH</b></div>
+              <div class="hlang" data-hlang></div>
+              <button class="hcancel" data-reset data-i18n="doneCancel"></button>
+            </div>
+            <div class="kstep" data-step="4"></div>
+            <div class="kbody">
+              <div class="done-band">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#fff" stroke-width="1.8"/><path d="M7.5 12.5l3 3 6-6.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div><b data-i18n="succBand"></b><span id="succMeta"></span></div>
+              </div>
+              <h3 class="ktitle" style="font-size:13.5px;margin-top:4px" data-i18n="succInst"></h3>
+              <div class="tickets" id="ticketRow"></div>
+              <p class="succ-note"><span data-i18n="saveNote"></span><br><span data-i18n="idle1"></span> <b id="idleCd">60</b> <span data-i18n="idle2"></span></p>
+            </div>
+            <div class="kfoot">
+              <button class="btn btn-ghost" data-reset data-i18n="finish"></button>
+              <button class="btn btn-gold" id="printBtn"><span data-i18n="printBtn"></span><small data-i18n="printBtnSmall"></small></button>
+            </div>
+          </section>
+
+          <!-- print overlay -->
+          <div class="print-ov" id="printOv">
+            <div class="pslot"></div>
+            <div class="receipt-clip">
+              <div class="receipt" id="receipt">
+                <div class="rh">TRUNG TÂM BẢO TỒN<br>DI TÍCH CỐ ĐÔ HUẾ</div>
+                <div class="rg">— VÉ THAM QUAN —</div>
+                <hr>
+                <div class="rn" id="rcName">Đại Nội Huế</div>
+                <div class="rt" id="rcType">Người lớn · 200.000đ</div>
+                <canvas id="rcQr" width="140" height="140"></canvas>
+                <div class="rc" id="rcCode">HUE-2026-000000</div>
+                <hr>
+                <div class="rt" id="rcDate">Hiệu lực trong ngày</div>
+              </div>
+            </div>
+            <div class="print-msg"><span id="prLbl"></span> <span id="prIdx">1/1</span><small id="prSub"></small></div>
+            <button class="print-done-btn" id="printDone" style="display:none"></button>
+          </div>
+
+        </div><!-- /screen -->
+
+        <div class="kiosk-below">
+          <div class="slot"><div class="slot-line"></div><span>KHE NHẬN VÉ · TICKET OUTLET · 取票口</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= RAIL ================= -->
+    <aside class="rail">
+      <div>
+        <h3>Luồng 8 màn hình</h3>
+        <div class="steps" id="stepRail"></div>
+      </div>
+      <div>
+        <h3>Ghi chú thiết kế</h3>
+        <div class="note-box" id="noteBox"></div>
+      </div>
+      <div>
+        <h3>Cấu hình phần cứng đề xuất</h3>
+        <ul class="hw-list">
+          <li><span>Khung máy (L×W×H)</span><b>600 × 500 × 1700 mm</b></li>
+          <li><span>Màn cảm ứng dọc</span><b>27–32″ · 1080×1920 · ≥700 nit</b></li>
+          <li><span>Tâm màn hình so với sàn</span><b>~1.150–1.400 mm</b></li>
+          <li><span>Máy in nhiệt</span><b>khổ 80 mm · cắt tự động</b></li>
+          <li><span>Khe xuất vé</span><b>cao ~900 mm</b></li>
+          <li><span>Thanh toán</span><b>VietQR + đầu đọc NAPAS/EMV</b></li>
+          <li><span>Ngôn ngữ giao diện</span><b>VI · EN · 中文 (mở rộng được)</b></li>
+          <li><span>Kết nối</span><b>LAN + 4G dự phòng</b></li>
+        </ul>
+      </div>
+      <div class="elev">
+        <svg width="210" height="300" viewBox="0 0 210 300" role="img" aria-label="Mặt đứng kiosk 600×1700mm">
+          <defs>
+            <marker id="ar" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0 0L6 3L0 6z" fill="currentColor"/></marker>
+          </defs>
+          <g color="var(--pg-faint)" font-size="9" font-family="inherit">
+            <rect x="60" y="14" width="86" height="258" rx="6" fill="none" stroke="var(--pg-soft)" stroke-width="1.6"/>
+            <rect x="70" y="26" width="66" height="18" rx="3" fill="var(--pg-gold)" opacity=".85"/>
+            <text x="103" y="38" text-anchor="middle" fill="#fff" font-weight="700" font-size="7.5">LOGO / ĐÈN HIỆU</text>
+            <rect x="70" y="52" width="66" height="118" rx="3" fill="none" stroke="var(--pg-accent)" stroke-width="1.6"/>
+            <text x="103" y="106" text-anchor="middle" fill="var(--pg-accent)" font-weight="700" font-size="8">MÀN CẢM ỨNG</text>
+            <text x="103" y="117" text-anchor="middle" fill="var(--pg-accent)" font-size="7.5">27–32″ dọc</text>
+            <rect x="76" y="180" width="54" height="7" rx="3.5" fill="var(--pg-ink)"/>
+            <text x="103" y="198" text-anchor="middle" font-size="7.5">KHE VÉ ~900mm</text>
+            <rect x="70" y="208" width="66" height="26" rx="3" fill="none" stroke="var(--pg-line)" stroke-width="1.4" stroke-dasharray="3 3"/>
+            <text x="103" y="224" text-anchor="middle" font-size="7.5">ĐẦU ĐỌC THẺ / QR</text>
+            <line x1="34" y1="14" x2="34" y2="272" stroke="currentColor" stroke-width="1" marker-start="url(#ar)" marker-end="url(#ar)"/>
+            <text x="26" y="148" text-anchor="middle" transform="rotate(-90 26 148)" font-size="8.5">1700 mm</text>
+            <line x1="60" y1="290" x2="146" y2="290" stroke="currentColor" stroke-width="1" marker-start="url(#ar)" marker-end="url(#ar)"/>
+            <text x="103" y="284" text-anchor="middle" font-size="8.5">600 mm</text>
+          </g>
+        </svg>
+        <p class="cap">Mặt đứng — vùng thao tác chính 1.000–1.500&nbsp;mm, đạt chuẩn với cả người ngồi xe lăn khi hạ CTA xuống đáy màn.</p>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="pg-foot">
+    <span>Giá vé theo bảng công bố áp dụng từ 02.06.2026 · Mã QR trong demo chỉ minh hoạ, không quét được</span>
+    <span>Concept v3 · tím Huế · VI/EN/中文 · 2026-07-11</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ---------- data (giá theo bảng 02.06.2026) ---------- */
+  var DIEM=[
+    {id:'dn',vi:'Đại Nội Huế',en:'Hue Imperial City',zh:'大内皇城（顺化皇宫）',a:200000,c:40000},
+    {id:'mm',vi:'Lăng vua Minh Mạng',en:'Minh Mang Royal Tomb',zh:'明命皇陵',a:150000,c:30000},
+    {id:'td',vi:'Lăng vua Tự Đức',en:'Tu Duc Royal Tomb',zh:'嗣德皇陵',a:150000,c:30000},
+    {id:'kd',vi:'Lăng vua Khải Định',en:'Khai Dinh Royal Tomb',zh:'启定皇陵',a:150000,c:30000},
+    {id:'gl',vi:'Lăng vua Gia Long',en:'Gia Long Royal Tomb',zh:'嘉隆皇陵',a:150000,c:0},
+    {id:'dk',vi:'Lăng vua Đồng Khánh',en:'Dong Khanh Royal Tomb',zh:'同庆皇陵',a:100000,c:0},
+    {id:'tt',vi:'Lăng vua Thiệu Trị',en:'Thieu Tri Royal Tomb',zh:'绍治皇陵',a:50000,c:0},
+    {id:'bt',vi:'Bảo tàng Cổ vật Cung đình Huế',en:'Museum of Royal Antiquities',zh:'宫廷古物博物馆',a:50000,c:0},
+    {id:'hc',vi:'Điện Hòn Chén',en:'Hon Chen Temple',zh:'惠南殿（Hon Chen）',a:50000,c:0},
+    {id:'ad',vi:'Cung An Định',en:'An Dinh Palace',zh:'安定宫',a:50000,c:0},
+    {id:'ng',vi:'Đàn Nam Giao',en:'Nam Giao Esplanade',zh:'南郊坛',a:50000,c:0},
+    {id:'dd',vi:'Lăng vua Dục Đức',en:'Duc Duc Royal Tomb',zh:'育德皇陵',a:50000,c:0},
+    {id:'hv',vi:'Hải Vân Quan',en:'Hai Van Gate',zh:'海云关',a:70000,c:0}
+  ];
+  var TUYEN=[
+    {id:'t1',vi:'Tuyến 2 điểm: Minh Mạng – Gia Long',en:'2-site route: Minh Mang – Gia Long',zh:'两点联票：明命皇陵 – 嘉隆皇陵',a:240000,c:30000},
+    {id:'t2',vi:'Tuyến 2 điểm: Tự Đức – Đồng Khánh',en:'2-site route: Tu Duc – Dong Khanh',zh:'两点联票：嗣德皇陵 – 同庆皇陵',a:200000,c:30000},
+    {id:'t3',vi:'Tuyến 2 điểm: Bảo tàng Cổ vật – Cung An Định',en:'2-site route: Antiquities Museum – An Dinh Palace',zh:'两点联票：古物博物馆 – 安定宫',a:80000,c:0},
+    {id:'t4',vi:'Tuyến 3 điểm: Đại Nội – Minh Mạng – Khải Định',en:'3-site route: Imperial City – Minh Mang – Khai Dinh',zh:'三点联票：大内皇城 – 明命 – 启定',a:420000,c:80000},
+    {id:'t5',vi:'Tuyến 3 điểm: Đại Nội – Minh Mạng – Tự Đức',en:'3-site route: Imperial City – Minh Mang – Tu Duc',zh:'三点联票：大内皇城 – 明命 – 嗣德',a:420000,c:80000},
+    {id:'t6',vi:'Tuyến 3 điểm: Đại Nội – Tự Đức – Khải Định',en:'3-site route: Imperial City – Tu Duc – Khai Dinh',zh:'三点联票：大内皇城 – 嗣德 – 启定',a:420000,c:80000},
+    {id:'t7',vi:'Tuyến 4 điểm: Đại Nội – Minh Mạng – Tự Đức – Khải Định',en:'4-site route: Imperial City – Minh Mang – Tu Duc – Khai Dinh',zh:'四点联票：大内皇城 – 明命 – 嗣德 – 启定',a:530000,c:100000},
+    {id:'t8',vi:'Tuyến gộp tất cả các điểm di tích',en:'All-sites pass — every monument',zh:'全景通票 — 所有遗迹景点',a:600000,c:120000}
+  ];
+  var ALL={}; DIEM.concat(TUYEN).forEach(function(x){ALL[x.id]=x;});
+
+  /* ---------- i18n ---------- */
+  var I18N={
+    vi:{
+      attractTitle:'Vé tham quan<br>Quần thể Di tích Cố đô Huế',
+      attractSub:'Hue Monuments · Self-service Ticketing',
+      cta:'CHẠM ĐỂ MUA VÉ',ctaSmall:'TOUCH TO START',
+      foot:'MỞ CỬA 06:30 – 17:30 · HOTLINE 0234.3523.237',
+      cancel:'✕ Hủy',doneCancel:'✕ Xong',back:'‹ Quay lại',
+      steps:['Chọn vé','Giỏ vé','Thanh toán','Nhận vé'],
+      typeTitle:'Quý khách muốn mua loại vé nào?',typeSub:'Which ticket type would you like?',
+      t1h:'Vé từng điểm di tích',t1p:'Đại Nội, các lăng vua, Hải Vân Quan… — 13 điểm',
+      t2h:'Vé tuyến — combo tiết kiệm',t2p:'Gói 2–4 điểm hoặc tuyến gộp tất cả — 8 tuyến',
+      childNote:'Trẻ em 7–12 tuổi được giảm hoặc miễn phí tuỳ điểm.<br>Trẻ dưới 7 tuổi miễn phí toàn bộ.',
+      listTitleDiem:'Chọn điểm di tích',listTitleTuyen:'Chọn tuyến tham quan',
+      listSubDiem:'Chạm vào điểm muốn tham quan · giá / người lớn',listSubTuyen:'Combo tiết kiệm hơn mua lẻ từng điểm',
+      child712:'Trẻ em 7–12',free:'Miễn phí',cartBtn:'Giỏ vé',
+      qtyTitle:'Chọn số lượng vé',qtySub:'Select ticket quantity',
+      adult:'Người lớn',adultSub:'Adult',child:'Trẻ em',childSub:'7–12 tuổi · Child',
+      addBtn:'Thêm vào giỏ',
+      cartTitle:'Giỏ vé của quý khách',cartSub:'Kiểm tra lại trước khi thanh toán',
+      addMore:'＋ Mua thêm vé khác',total:'TỔNG CỘNG · TOTAL',
+      payBtn:'Thanh toán ›',payBtnSmall:'PAYMENT',
+      lineAdult:'người lớn',lineChild:'trẻ em',rmLbl:'Xoá dòng vé',
+      payTitle:'Chọn phương thức thanh toán',paySub:'Select payment method',
+      o1h:'VietQR — quét bằng app ngân hàng',o1p:'Hỗ trợ tất cả ngân hàng & ví có VietQR',
+      o2h:'Thẻ ngân hàng — chạm hoặc quẹt',o2p:'NAPAS · Visa · Mastercard (đầu đọc bên phải)',
+      amount:'SỐ TIỀN · AMOUNT',confirm:'Xác nhận ›',confirmSmall:'CONFIRM',
+      payqrTitle:'Quét mã để thanh toán',payqrSub:'Mở app ngân hàng bất kỳ → quét VietQR',
+      refLbl:'Nội dung:',expire:'Mã hết hạn sau',demoPay:'▶ demo — mô phỏng khách đã chuyển tiền',changePm:'‹ Đổi cách trả',
+      succBand:'Thanh toán thành công!',orderLbl:'Mã đơn',
+      succInst:'Vé QR của quý khách — đưa mã này tại cổng soát vé',
+      saveNote:'Chụp lại màn hình để lưu vé.',idle1:'Màn hình tự trở về sau',idle2:'giây.',
+      finish:'Kết thúc',printBtn:'🖨 In vé nhiệt',printBtnSmall:'PRINT TICKETS (80MM)',
+      printing:'Đang in vé',printedAll:'Đã in xong',prSub:'Vui lòng nhận vé tại khe phía dưới màn hình',
+      printDone:'Đã nhận đủ vé ✓',valid:'Hiệu lực trong ngày · Valid today',
+      tikAdult:'Người lớn',tikChild:'Trẻ em 7–12'
+    },
+    en:{
+      attractTitle:'Sightseeing Tickets<br>Complex of Hue Monuments',
+      attractSub:'Trung tâm Bảo tồn Di tích Cố đô Huế',
+      cta:'TOUCH TO BUY TICKETS',ctaSmall:'SELF-SERVICE KIOSK',
+      foot:'OPEN 06:30 – 17:30 · HOTLINE 0234.3523.237',
+      cancel:'✕ Cancel',doneCancel:'✕ Done',back:'‹ Back',
+      steps:['Select','Cart','Payment','Tickets'],
+      typeTitle:'Which ticket would you like?',typeSub:'Tap an option below',
+      t1h:'Single-site tickets',t1p:'Imperial City, royal tombs, Hai Van Gate… — 13 sites',
+      t2h:'Route passes — combo savings',t2p:'2–4 sites or the all-sites pass — 8 routes',
+      childNote:'Children 7–12: discounted or free depending on the site.<br>Under 7: free everywhere.',
+      listTitleDiem:'Choose a site',listTitleTuyen:'Choose a route pass',
+      listSubDiem:'Tap a site to visit · price per adult',listSubTuyen:'Passes cost less than buying sites separately',
+      child712:'Child 7–12',free:'Free',cartBtn:'Cart',
+      qtyTitle:'Select quantity',qtySub:'How many tickets?',
+      adult:'Adult',adultSub:'Người lớn',child:'Child',childSub:'Age 7–12 · Trẻ em',
+      addBtn:'Add to cart',
+      cartTitle:'Your cart',cartSub:'Review before payment',
+      addMore:'＋ Add more tickets',total:'TOTAL',
+      payBtn:'Pay ›',payBtnSmall:'PAYMENT',
+      lineAdult:'adult',lineChild:'child',rmLbl:'Remove line',
+      payTitle:'Choose payment method',paySub:'All payments are cashless',
+      o1h:'VietQR — scan with your banking app',o1p:'Works with all Vietnamese banks & e-wallets',
+      o2h:'Bank card — tap or swipe',o2p:'NAPAS · Visa · Mastercard (reader on the right)',
+      amount:'AMOUNT',confirm:'Confirm ›',confirmSmall:'CONTINUE',
+      payqrTitle:'Scan to pay',payqrSub:'Open your banking app → scan the VietQR code',
+      refLbl:'Reference:',expire:'Code expires in',demoPay:'▶ demo — simulate payment received',changePm:'‹ Change method',
+      succBand:'Payment successful!',orderLbl:'Order',
+      succInst:'Your QR tickets — show these at the entrance gate',
+      saveNote:'Take a photo to save your tickets.',idle1:'Returning to home screen in',idle2:'s.',
+      finish:'Finish',printBtn:'🖨 Print tickets',printBtnSmall:'THERMAL 80MM',
+      printing:'Printing ticket',printedAll:'All tickets printed',prSub:'Please collect your tickets from the slot below',
+      printDone:'Tickets collected ✓',valid:'Valid today',
+      tikAdult:'Adult',tikChild:'Child 7–12'
+    },
+    zh:{
+      attractTitle:'顺化古都遗迹群<br>参观门票',
+      attractSub:'顺化古都遗迹保护中心 · 自助售票',
+      cta:'触摸屏幕 · 购买门票',ctaSmall:'TOUCH TO START',
+      foot:'开放时间 06:30 – 17:30 · 热线 0234.3523.237',
+      cancel:'✕ 取消',doneCancel:'✕ 完成',back:'‹ 返回',
+      steps:['选票','购物篮','支付','取票'],
+      typeTitle:'请选择门票类型',typeSub:'点击下方选项',
+      t1h:'单点门票',t1p:'大内皇城、各皇陵、海云关…… 共13处景点',
+      t2h:'联票套餐 — 更加优惠',t2p:'2–4点联票或全景通票 — 共8条线路',
+      childNote:'7–12岁儿童视景点减免票价。<br>7岁以下儿童全部免费。',
+      listTitleDiem:'选择景点',listTitleTuyen:'选择联票线路',
+      listSubDiem:'点击想参观的景点 · 成人票价',listSubTuyen:'联票比单点购票更划算',
+      child712:'儿童 7–12岁',free:'免费',cartBtn:'购物篮',
+      qtyTitle:'选择票数',qtySub:'请选择购票数量',
+      adult:'成人',adultSub:'Adult',child:'儿童',childSub:'7–12岁 · Child',
+      addBtn:'加入购物篮',
+      cartTitle:'您的购物篮',cartSub:'支付前请确认',
+      addMore:'＋ 继续购票',total:'合计 · TOTAL',
+      payBtn:'去支付 ›',payBtnSmall:'PAYMENT',
+      lineAdult:'成人',lineChild:'儿童',rmLbl:'删除此项',
+      payTitle:'选择支付方式',paySub:'均为无现金支付',
+      o1h:'VietQR — 用银行App扫码支付',o1p:'支持越南所有银行及电子钱包',
+      o2h:'银行卡 — 拍卡或刷卡',o2p:'NAPAS · Visa · 万事达（读卡器在右侧）',
+      amount:'金额 · AMOUNT',confirm:'确认 ›',confirmSmall:'CONFIRM',
+      payqrTitle:'扫码支付',payqrSub:'打开银行App → 扫描VietQR二维码',
+      refLbl:'附言：',expire:'二维码有效时间',demoPay:'▶ 演示 — 模拟支付成功',changePm:'‹ 更换支付方式',
+      succBand:'支付成功！',orderLbl:'订单号',
+      succInst:'您的二维码门票 — 检票时请出示',
+      saveNote:'可拍照保存门票。',idle1:'屏幕将在',idle2:'秒后返回首页。',
+      finish:'完成',printBtn:'🖨 打印纸质票',printBtnSmall:'80MM 热敏打印',
+      printing:'正在打印',printedAll:'打印完成',prSub:'请在屏幕下方取票口取票',
+      printDone:'已取票 ✓',valid:'当日有效 · Valid today',
+      tikAdult:'成人',tikChild:'儿童 7–12岁'
+    }
+  };
+
+  /* ---------- emblem ---------- */
+  function emblem(size){
+    return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 48 48" role="img" aria-label="Logo TTBTDT Cố đô Huế">'
+      +'<circle cx="24" cy="24" r="22.5" fill="#1D4E9E"/>'
+      +'<circle cx="24" cy="24" r="22.5" fill="none" stroke="#E9B949" stroke-width="1.6"/>'
+      +'<circle cx="24" cy="24" r="17.5" fill="none" stroke="#fff" stroke-width=".9" opacity=".55"/>'
+      +'<g stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round">'
+      +'<path d="M13 32h22"/><path d="M15 32v-7h18v7"/><path d="M15 25l2-3h14l2 3"/>'
+      +'<path d="M20 32v-4.5h8V32"/><path d="M21 22v-3.5h6V22"/><path d="M20 18.5l1.4-2h5.2l1.4 2"/>'
+      +'<path d="M17 14.5c2-1.6 4.5-1 4.5-1M31 14.5c-2-1.6-4.5-1-4.5-1" stroke-width="1.1"/>'
+      +'</g><circle cx="24" cy="10.5" r="1" fill="#E9B949"/></svg>';
+  }
+  document.getElementById('embSmall').innerHTML=emblem(34);
+  document.getElementById('embBig').innerHTML=emblem(88);
+  document.querySelectorAll('[data-emb]').forEach(function(el){el.innerHTML=emblem(26);});
+
+  /* mini language switch in every flow header */
+  document.querySelectorAll('[data-hlang]').forEach(function(el){
+    el.innerHTML='<button data-setlang="vi">VI</button><button data-setlang="en">EN</button><button data-setlang="zh">中</button>';
+  });
+
+  /* ---------- helpers ---------- */
+  var state={scr:'attract',lang:'vi',mode:'diem',pick:null,qa:1,qc:0,cart:[],order:null};
+  function T(k){return I18N[state.lang][k];}
+  function nm(d){return d[state.lang]||d.vi;}
+  function sec(d){return state.lang==='vi'?d.en:d.vi;}
+  function vnd(n){return n===0?T('free'):n.toLocaleString('vi-VN')+'đ';}
+  function vndZ(n){return n.toLocaleString('vi-VN')+'đ';}
+
+  /* QR-look renderer (visual mock, deterministic per seed) */
+  function drawQR(canvas,seed){
+    var ctx=canvas.getContext('2d'),N=29,S=canvas.width,q=2,cell=S/(N+q*2);
+    var h=2166136261;for(var i=0;i<seed.length;i++){h^=seed.charCodeAt(i);h=Math.imul(h,16777619);}
+    function rnd(){h=Math.imul(h^(h>>>15),2246822519);h=Math.imul(h^(h>>>13),3266489917);return((h^=h>>>16)>>>0)/4294967296;}
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,S,S);ctx.fillStyle='#101828';
+    function inFinder(r,c){return(r<7&&c<7)||(r<7&&c>=N-7)||(r>=N-7&&c<7);}
+    for(var r=0;r<N;r++)for(var c=0;c<N;c++){
+      if(inFinder(r,c))continue;
+      if(r===6||c===6){if((r+c)%2===0)ctx.fillRect((c+q)*cell,(r+q)*cell,cell,cell);continue;}
+      if(rnd()<0.46)ctx.fillRect((c+q)*cell,(r+q)*cell,cell,cell);
+    }
+    function finder(r,c){
+      ctx.fillRect((c+q)*cell,(r+q)*cell,7*cell,7*cell);
+      ctx.fillStyle='#fff';ctx.fillRect((c+1+q)*cell,(r+1+q)*cell,5*cell,5*cell);
+      ctx.fillStyle='#101828';ctx.fillRect((c+2+q)*cell,(r+2+q)*cell,3*cell,3*cell);
+    }
+    finder(0,0);finder(0,N-7);finder(N-7,0);
+  }
+
+  /* ---------- i18n apply ---------- */
+  function applyStatic(){
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      var v=T(el.dataset.i18n);if(v!==undefined)el.innerHTML=v;
+    });
+    document.querySelectorAll('.lang').forEach(function(l){l.classList.toggle('on',l.dataset.lang===state.lang);});
+    document.querySelectorAll('[data-setlang]').forEach(function(b){b.classList.toggle('on',b.dataset.setlang===state.lang);});
+    buildSteppers();paintStep();
+  }
+  function setLang(lang){
+    state.lang=lang;applyStatic();
+    /* re-render dynamic content of current screen */
+    if(state.scr==='list')renderList();
+    if(state.scr==='qty')renderQty();
+    if(state.scr==='cart')renderCart();
+    if(state.scr==='pay')document.getElementById('payTotal').textContent=vndZ(cartTotal());
+    if(state.scr==='success')renderSuccess();
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('[data-setlang]');
+    if(b){e.stopPropagation();setLang(b.dataset.setlang);}
+  },true);
+  document.querySelectorAll('.lang').forEach(function(l){
+    l.addEventListener('click',function(e){e.stopPropagation();setLang(l.dataset.lang);});
+  });
+
+  /* ---------- steppers ---------- */
+  var STEPMAP={type:1,list:1,qty:2,cart:2,pay:3,payqr:3,success:4};
+  function buildSteppers(){
+    var labels=T('steps');
+    document.querySelectorAll('.kstep').forEach(function(el){
+      el.innerHTML=labels.map(function(s,i){
+        return '<div class="ks" data-i="'+(i+1)+'"><div class="dot">0'+(i+1)+'</div><div class="lbl">'+s+'</div></div>';
+      }).join('');
+    });
+  }
+  function paintStep(){
+    var cur=STEPMAP[state.scr]||0;
+    document.querySelectorAll('.kstep').forEach(function(el){
+      el.querySelectorAll('.ks').forEach(function(k){
+        var i=+k.dataset.i;k.classList.toggle('done',i<cur);k.classList.toggle('now',i===cur);
+      });
+    });
+  }
+
+  /* ---------- rail (review-side, VN) ---------- */
+  var NOTES={
+    attract:'<b>Màn hình chờ.</b> Chạm bất kỳ đâu để bắt đầu; chọn ngôn ngữ ngay tại đây — <b>VI/EN/中文 hoạt động thật</b>, đổi toàn bộ giao diện gồm cả tên di tích và vé in. Có thể đổi tiếp giữa chừng bằng nút nhỏ trên header.',
+    type:'<b>Rẽ nhánh đầu tiên</b> theo bảng giá hiện hành: vé điểm lẻ (13 điểm) hoặc vé tuyến combo (8 tuyến). Nút chạm cao ≥80&nbsp;px thực (~20&nbsp;mm) — chuẩn ngón tay cái.',
+    list:'<b>Lưới chọn điểm.</b> Tên di tích hiển thị theo ngôn ngữ đã chọn (bản dịch Anh/Trung chuẩn địa danh). Giá người lớn/trẻ em hiện ngay trên thẻ, danh sách cuộn dọc.',
+    qty:'<b>Bộ đếm số lượng</b> với nút ± cỡ 40&nbsp;px (~15&nbsp;mm). Quy tắc trẻ em (7–12 tuổi giảm/miễn phí) tự áp theo điểm, khách không phải tự tính.',
+    cart:'<b>Giỏ vé.</b> Xem lại, sửa số lượng hoặc xoá từng dòng, mua gộp nhiều điểm trong một lần trả tiền.',
+    pay:'<b>Không dùng tiền mặt.</b> VietQR phủ mọi ngân hàng và ví trong nước; đầu đọc thẻ NAPAS/EMV phục vụ khách dùng thẻ quốc tế — cả 2 luôn hiển thị.',
+    payqr:'<b>Màn quét QR</b> có đồng hồ đếm ngược 2 phút và nút huỷ rõ ràng. Khi cổng thanh toán báo về (webhook), máy tự nhảy sang màn nhận vé — khách không phải bấm gì.',
+    success:'<b>Xuất vé 2 cách:</b> QR hiển thị ngay trên màn (chụp lại bằng điện thoại) hoặc in vé nhiệt 80&nbsp;mm — mỗi vé một mã riêng để soát tại cổng. Tự về màn hình chờ sau 60&nbsp;giây.'
+  };
+  var RAIL=[
+    ['attract','Màn hình chờ','chạm để bắt đầu · VI/EN/中文'],
+    ['type','Chọn loại vé','vé điểm lẻ / vé tuyến combo'],
+    ['list','Chọn điểm / tuyến','13 điểm · 8 tuyến, tên theo ngôn ngữ'],
+    ['qty','Số lượng vé','người lớn / trẻ em 7–12'],
+    ['cart','Giỏ vé','gộp nhiều điểm · sửa / xoá'],
+    ['pay','Phương thức','VietQR · thẻ NAPAS/EMV'],
+    ['payqr','Quét mã QR','countdown 2 phút · tự xác nhận'],
+    ['success','Nhận vé','QR màn hình + in nhiệt 80mm']
+  ];
+  var railEl=document.getElementById('stepRail');
+  RAIL.forEach(function(r,i){
+    var b=document.createElement('button');b.className='stp';b.dataset.scr=r[0];
+    b.innerHTML='<span class="no">'+(i)+'</span><span class="st">'+r[1]+'<small>'+r[2]+'</small></span>';
+    b.addEventListener('click',function(){jumpTo(r[0]);});
+    railEl.appendChild(b);
+  });
+
+  /* ---------- navigation ---------- */
+  var cdTimer=null,idleTimer=null;
+  function show(scr){
+    state.scr=scr;
+    document.querySelectorAll('.scr').forEach(function(s){s.classList.toggle('active',s.dataset.scr===scr);});
+    document.querySelectorAll('.stp').forEach(function(b){b.classList.toggle('on',b.dataset.scr===scr);});
+    document.getElementById('noteBox').innerHTML=NOTES[scr]||'';
+    paintStep();
+    clearInterval(cdTimer);clearInterval(idleTimer);
+    if(scr==='payqr')startCountdown();
+    if(scr==='success')startIdle();
+  }
+  function go(scr){
+    if(scr==='list')renderList();
+    if(scr==='qty')renderQty();
+    if(scr==='cart')renderCart();
+    if(scr==='pay')document.getElementById('payTotal').textContent=vndZ(cartTotal());
+    if(scr==='payqr')renderPayQR();
+    show(scr);
+  }
+  function resetAll(){
+    state.pick=null;state.qa=1;state.qc=0;state.cart=[];state.order=null;
+    document.getElementById('printOv').classList.remove('active');
+    show('attract');
+  }
+  function jumpTo(scr){
+    if(scr==='attract'){resetAll();return;}
+    if((scr==='qty')&&!state.pick){state.pick='dn';state.qa=2;state.qc=1;}
+    if(['cart','pay','payqr','success'].indexOf(scr)>=0&&state.cart.length===0){
+      state.cart=[{id:'dn',a:2,c:1},{id:'t2',a:1,c:0}];
+    }
+    if(scr==='success'&&!state.order)makeOrder();
+    if(scr==='success')renderSuccess();
+    go(scr);
+  }
+  document.querySelectorAll('[data-go]').forEach(function(b){
+    b.addEventListener('click',function(){go(b.dataset.go);});
+  });
+  document.querySelectorAll('[data-reset]').forEach(function(b){
+    b.addEventListener('click',function(e){e.stopPropagation();resetAll();});
+  });
+  document.getElementById('scrAttract').addEventListener('click',function(){go('type');});
+  document.querySelectorAll('.type-card').forEach(function(c){
+    c.addEventListener('click',function(){state.mode=c.dataset.mode;go('list');});
+  });
+  document.querySelectorAll('.pay-opt').forEach(function(p){
+    p.addEventListener('click',function(){
+      document.querySelectorAll('.pay-opt').forEach(function(x){x.classList.remove('on');});p.classList.add('on');});
+  });
+
+  /* ---------- list ---------- */
+  function renderList(){
+    var grid=document.getElementById('siteGrid');grid.innerHTML='';
+    var data=state.mode==='diem'?DIEM:TUYEN;
+    document.getElementById('listTitle').textContent=state.mode==='diem'?T('listTitleDiem'):T('listTitleTuyen');
+    document.getElementById('listSub').textContent=state.mode==='diem'?T('listSubDiem'):T('listSubTuyen');
+    data.forEach(function(d){
+      var b=document.createElement('button');
+      b.className='site'+(state.mode==='tuyen'?' route':'');
+      b.innerHTML='<h5>'+nm(d)+'</h5><div class="'+(state.mode==='tuyen'?'rp':'')+'"><div class="pr">'+vndZ(d.a)+'</div>'
+        +'<div class="pc">'+T('child712')+': '+(d.c===0?'<b>'+T('free')+'</b>':vndZ(d.c))+'</div></div>';
+      b.addEventListener('click',function(){state.pick=d.id;state.qa=1;state.qc=0;go('qty');});
+      grid.appendChild(b);
+    });
+    var mini=document.getElementById('toCartFromList');
+    mini.style.display=state.cart.length?'block':'none';
+    document.getElementById('miniCount').textContent=state.cart.length;
+  }
+
+  /* ---------- qty ---------- */
+  function renderQty(){
+    var d=ALL[state.pick];if(!d)return;
+    var card=document.getElementById('qtyCard');
+    card.innerHTML='<div class="nm">'+nm(d)+'</div><div class="en">'+sec(d)+'</div>'
+      +'<div class="qrow"><div class="who"><b>'+T('adult')+'</b><span>'+T('adultSub')+'</span></div><div class="p">'+vndZ(d.a)+'</div>'
+      +'<div class="step-ctl"><button id="aMinus">−</button><span class="n" id="aN">1</span><button id="aPlus">＋</button></div></div>'
+      +'<div class="qrow"><div class="who"><b>'+T('child')+'</b><span>'+T('childSub')+'</span></div><div class="p'+(d.c===0?' free':'')+'">'+vnd(d.c)+'</div>'
+      +'<div class="step-ctl"><button id="cMinus">−</button><span class="n" id="cN">0</span><button id="cPlus">＋</button></div></div>';
+    function paint(){
+      document.getElementById('aN').textContent=state.qa;
+      document.getElementById('cN').textContent=state.qc;
+      document.getElementById('aMinus').disabled=state.qa<=0;
+      document.getElementById('cMinus').disabled=state.qc<=0;
+      var sum=state.qa*d.a+state.qc*d.c;
+      document.getElementById('addSum').textContent=vndZ(sum);
+      document.getElementById('addBtn').disabled=(state.qa+state.qc)===0;
+    }
+    document.getElementById('aPlus').onclick=function(){if(state.qa<9)state.qa++;paint();};
+    document.getElementById('aMinus').onclick=function(){if(state.qa>0)state.qa--;paint();};
+    document.getElementById('cPlus').onclick=function(){if(state.qc<9)state.qc++;paint();};
+    document.getElementById('cMinus').onclick=function(){if(state.qc>0)state.qc--;paint();};
+    paint();
+  }
+  document.getElementById('addBtn').addEventListener('click',function(){
+    if(state.qa+state.qc===0)return;
+    var ex=state.cart.find(function(l){return l.id===state.pick;});
+    if(ex){ex.a+=state.qa;ex.c+=state.qc;}else{state.cart.push({id:state.pick,a:state.qa,c:state.qc});}
+    go('cart');
+  });
+
+  /* ---------- cart ---------- */
+  function cartTotal(){
+    return state.cart.reduce(function(s,l){var d=ALL[l.id];return s+l.a*d.a+l.c*d.c;},0);
+  }
+  function renderCart(){
+    var box=document.getElementById('cartLines');box.innerHTML='';
+    state.cart.forEach(function(l,idx){
+      var d=ALL[l.id],sum=l.a*d.a+l.c*d.c;
+      var parts=[];if(l.a)parts.push(l.a+' '+T('lineAdult'));if(l.c)parts.push(l.c+' '+T('lineChild'));
+      var div=document.createElement('div');div.className='cline';
+      div.innerHTML='<div class="ci"><b>'+nm(d)+'</b><span>'+parts.join(' · ')+'</span></div>'
+        +'<div class="cp">'+vndZ(sum)+'</div><button class="rm" aria-label="'+T('rmLbl')+'">✕</button>';
+      div.querySelector('.rm').addEventListener('click',function(){state.cart.splice(idx,1);renderCart();});
+      box.appendChild(div);
+    });
+    document.getElementById('cartTotal').textContent=vndZ(cartTotal());
+    document.getElementById('toPay').disabled=state.cart.length===0;
+  }
+
+  /* ---------- pay QR ---------- */
+  var orderCounter=137;
+  function makeOrder(){
+    orderCounter++;
+    var ref='HUE'+String(202600+orderCounter);
+    state.order={ref:ref,total:cartTotal()};
+  }
+  function renderPayQR(){
+    makeOrder();
+    var amt=state.order.total;
+    document.getElementById('payQrAmt').textContent=vndZ(amt);
+    document.getElementById('payRef').textContent=state.order.ref;
+    drawQR(document.getElementById('payQrCanvas'),'VIETQR|'+state.order.ref+'|'+amt);
+  }
+  function startCountdown(){
+    var t=120,el=document.getElementById('cd');
+    function paint(){var m=String(Math.floor(t/60)).padStart(2,'0'),s=String(t%60).padStart(2,'0');el.textContent=m+':'+s;}
+    paint();
+    cdTimer=setInterval(function(){t--;if(t<=0){clearInterval(cdTimer);resetAll();return;}paint();},1000);
+  }
+  document.getElementById('demoPay').addEventListener('click',function(){
+    renderSuccess();go('success');
+  });
+
+  /* ---------- success ---------- */
+  function flatTickets(){
+    var out=[],n=0;
+    state.cart.forEach(function(l){
+      var d=ALL[l.id];
+      for(var i=0;i<l.a;i++){n++;out.push({name:nm(d),type:T('tikAdult')+' · '+vndZ(d.a),code:state.order.ref+'-'+String(n).padStart(2,'0')});}
+      for(var j=0;j<l.c;j++){n++;out.push({name:nm(d),type:T('tikChild')+' · '+vnd(d.c),code:state.order.ref+'-'+String(n).padStart(2,'0')});}
+    });
+    return out;
+  }
+  function renderSuccess(){
+    if(!state.order)makeOrder();
+    document.getElementById('succMeta').textContent=T('orderLbl')+' '+state.order.ref+' · '+vndZ(state.order.total);
+    var row=document.getElementById('ticketRow');row.innerHTML='';
+    flatTickets().forEach(function(t){
+      var div=document.createElement('div');div.className='tik';
+      div.innerHTML='<div class="tn">'+t.name+'</div><div class="tt">'+t.type+'</div>'
+        +'<canvas width="140" height="140"></canvas><div class="tc">'+t.code+'</div>';
+      row.appendChild(div);
+      drawQR(div.querySelector('canvas'),'TICKET|'+t.code);
+    });
+  }
+  function startIdle(){
+    var t=60,el=document.getElementById('idleCd');el.textContent=t;
+    idleTimer=setInterval(function(){t--;el.textContent=t;if(t<=0){clearInterval(idleTimer);resetAll();}},1000);
+  }
+
+  /* ---------- print sim ---------- */
+  var printQueue=[],printIdx=0;
+  document.getElementById('printBtn').addEventListener('click',function(){
+    clearInterval(idleTimer);
+    printQueue=flatTickets();printIdx=0;
+    document.getElementById('printOv').classList.add('active');
+    document.getElementById('printDone').style.display='none';
+    document.getElementById('printDone').textContent=T('printDone');
+    document.getElementById('prSub').textContent=T('prSub');
+    printNext();
+  });
+  function printNext(){
+    if(printIdx>=printQueue.length){
+      document.getElementById('prLbl').textContent=T('printedAll');
+      document.getElementById('prIdx').textContent=printQueue.length+'/'+printQueue.length;
+      document.getElementById('printDone').style.display='block';
+      return;
+    }
+    var t=printQueue[printIdx];
+    document.getElementById('prLbl').textContent=T('printing');
+    document.getElementById('prIdx').textContent=(printIdx+1)+'/'+printQueue.length;
+    document.getElementById('rcName').textContent=t.name;
+    document.getElementById('rcType').textContent=t.type;
+    document.getElementById('rcCode').textContent=t.code;
+    document.getElementById('rcDate').textContent=T('valid');
+    drawQR(document.getElementById('rcQr'),'TICKET|'+t.code);
+    var r=document.getElementById('receipt');
+    r.classList.remove('out');void r.offsetWidth;
+    setTimeout(function(){r.classList.add('out');},60);
+    setTimeout(function(){printIdx++;printNext();},2400);
+  }
+  document.getElementById('printDone').addEventListener('click',function(){
+    document.getElementById('printOv').classList.remove('active');
+    startIdle();
+  });
+
+  /* ---------- boot ---------- */
+  applyStatic();
+  show('attract');
+})();
+</script>
