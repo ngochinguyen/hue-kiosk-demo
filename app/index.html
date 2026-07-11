@@ -1,0 +1,968 @@
+<title>Mobile App — Vé tham quan Di tích Cố đô Huế</title>
+<style>
+  /* ---------- page tokens (themed) ---------- */
+  :root{
+    --pg-bg:#EFECEF; --pg-surface:#FAF8FA; --pg-line:#DAD3DB;
+    --pg-ink:#26222B; --pg-soft:#5F5866; --pg-faint:#8F8896;
+    --pg-accent:#63377D; --pg-gold:#B98A22;
+    --pg-shadow:0 18px 50px rgba(52,27,70,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --pg-bg:#17151B; --pg-surface:#211E27; --pg-line:#37323F;
+      --pg-ink:#EAE7EC; --pg-soft:#AFA8B6; --pg-faint:#7D7685;
+      --pg-accent:#C39BDD; --pg-gold:#D8AE55;
+      --pg-shadow:0 18px 50px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --pg-bg:#17151B; --pg-surface:#211E27; --pg-line:#37323F;
+    --pg-ink:#EAE7EC; --pg-soft:#AFA8B6; --pg-faint:#7D7685;
+    --pg-accent:#C39BDD; --pg-gold:#D8AE55;
+    --pg-shadow:0 18px 50px rgba(0,0,0,.5);
+  }
+  :root[data-theme="light"]{
+    --pg-bg:#EFECEF; --pg-surface:#FAF8FA; --pg-line:#DAD3DB;
+    --pg-ink:#26222B; --pg-soft:#5F5866; --pg-faint:#8F8896;
+    --pg-accent:#63377D; --pg-gold:#B98A22;
+    --pg-shadow:0 18px 50px rgba(52,27,70,.18);
+  }
+
+  /* ---------- app fixed palette — tím Huế ---------- */
+  :root{
+    --a-purple:#472759; --a-purple-2:#301640; --a-acc:#6B3F86;
+    --a-paper:#FBF7F2; --a-card:#FFFFFF; --a-line:#E4DBD0;
+    --a-ink:#241B2E; --a-soft:#645A6E; --a-faint:#9C92A6;
+    --a-gold:#E9B949; --a-gold-deep:#C6952B; --a-gold-ink:#3A2C08;
+    --a-green:#2E7D4F; --a-red:#B4452F;
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--pg-bg);color:var(--pg-ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei","Malgun Gothic",Arial,sans-serif;
+    font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1200px;margin:0 auto;padding:44px 24px 90px}
+
+  .eyebrow{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--pg-gold);font-weight:700;margin:0 0 10px}
+  h1{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-size:34px;font-weight:600;margin:0;letter-spacing:-.01em;text-wrap:balance}
+  .lede{color:var(--pg-soft);max-width:68ch;margin:12px 0 0;font-size:15px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .chip{font-size:12.5px;font-weight:600;color:var(--pg-soft);background:var(--pg-surface);
+    border:1px solid var(--pg-line);border-radius:999px;padding:5px 13px}
+  .chip b{color:var(--pg-ink)}
+
+  .stage{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:36px;margin-top:40px;align-items:start}
+  @media(max-width:980px){.stage{grid-template-columns:1fr}}
+
+  /* ---------- phone frame ---------- */
+  .device-col{display:flex;justify-content:center}
+  .phone{width:352px;max-width:100%;background:#141018;border-radius:46px;padding:12px;
+    box-shadow:var(--pg-shadow),inset 0 0 0 2px #2A2130;position:relative}
+  .pscreen{position:relative;width:100%;aspect-ratio:390/800;background:var(--a-paper);
+    border-radius:36px;overflow:hidden}
+  .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:96px;height:24px;
+    background:#141018;border-radius:999px;z-index:50}
+  .homebar{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:110px;height:4px;
+    background:rgba(0,0,0,.35);border-radius:999px;z-index:50;pointer-events:none}
+
+  /* ---------- screens ---------- */
+  .scr{position:absolute;inset:0;display:none;flex-direction:column;background:var(--a-paper);color:var(--a-ink)}
+  .scr.active{display:flex}
+
+  /* app header */
+  .ahead{background:var(--a-purple);color:#fff;padding:38px 16px 12px;display:flex;align-items:center;gap:10px;flex:none}
+  .ahead .hlogo{flex:none}
+  .ahead .ht{flex:1;min-width:0}
+  .ahead .ht b{display:block;font-size:12px;font-weight:800;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ahead .ht span{font-size:8.5px;color:#CBB8DC;letter-spacing:.08em;font-weight:700}
+  .icon-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;
+    border-radius:10px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex:none}
+  .icon-btn .badge{position:absolute;top:-5px;right:-5px;background:var(--a-gold);color:var(--a-gold-ink);
+    font-size:8.5px;font-weight:800;border-radius:999px;min-width:15px;height:15px;display:flex;align-items:center;justify-content:center;padding:0 3px}
+  .back-btn{background:none;border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;padding:6px 8px 6px 0}
+
+  .abody{flex:1;overflow-y:auto;padding:14px 14px 8px;display:flex;flex-direction:column;gap:10px}
+  .abody::-webkit-scrollbar{width:4px}
+  .abody::-webkit-scrollbar-thumb{background:var(--a-line);border-radius:2px}
+
+  /* bottom nav */
+  .anav{flex:none;background:#fff;border-top:1px solid var(--a-line);display:flex;padding:6px 10px 18px}
+  .anav button{flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;
+    font-size:9px;font-weight:700;color:var(--a-faint);padding:5px 0;position:relative}
+  .anav button.on{color:var(--a-acc)}
+  .anav button svg{width:21px;height:21px}
+  .anav .nbadge{position:absolute;top:0;right:calc(50% - 18px);background:var(--a-gold);color:var(--a-gold-ink);
+    font-size:8px;font-weight:800;border-radius:999px;min-width:14px;height:14px;display:flex;align-items:center;justify-content:center}
+
+  /* language screen */
+  .scr-lang{background:radial-gradient(120% 80% at 50% -10%,#5E3975 0%,#3E2052 50%,#241030 100%);color:#fff}
+  .lang-inner{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px;gap:0}
+  .lang-inner h2{font-family:Georgia,serif;font-size:19px;font-weight:600;margin:16px 0 2px;text-align:center}
+  .lang-inner .ls{font-size:10.5px;color:#D6C6E6;margin-bottom:20px}
+  .lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+  .lang-opt{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.22);border-radius:12px;
+    color:#fff;padding:11px 8px;cursor:pointer;text-align:center}
+  .lang-opt b{display:block;font-size:12.5px;font-weight:800}
+  .lang-opt span{font-size:8.5px;color:#C9B6DA;letter-spacing:.04em}
+  .lang-opt.on{background:var(--a-gold);border-color:var(--a-gold)}
+  .lang-opt.on b{color:var(--a-gold-ink)}
+  .lang-opt.on span{color:#7A5F14}
+  .lang-cta{margin-top:20px;width:100%;background:var(--a-gold);color:var(--a-gold-ink);border:none;border-radius:13px;
+    font-size:14px;font-weight:800;padding:15px;cursor:pointer;box-shadow:0 3px 0 var(--a-gold-deep)}
+
+  /* home */
+  .hero{background:linear-gradient(135deg,#5E3975,#3E2052 70%);border-radius:16px;padding:16px;color:#fff;position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;
+    border:22px solid rgba(233,185,73,.16)}
+  .hero h3{margin:0 0 3px;font-family:Georgia,serif;font-size:17px;font-weight:600}
+  .hero p{margin:0;font-size:10px;color:#D6C6E6}
+  .seg{display:flex;background:#fff;border:1.5px solid var(--a-line);border-radius:11px;padding:3px;gap:3px}
+  .seg button{flex:1;border:none;background:none;border-radius:8px;font-size:11px;font-weight:800;color:var(--a-soft);padding:8px;cursor:pointer}
+  .seg button.on{background:var(--a-purple);color:#fff}
+  .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .scard{background:var(--a-card);border:1.5px solid var(--a-line);border-radius:13px;overflow:hidden;cursor:pointer;text-align:left;padding:0}
+  .scard .im{height:56px;background:linear-gradient(135deg,#7A4E96,#472759);position:relative}
+  .scard .im::after{content:"";position:absolute;inset:0;background:
+    radial-gradient(60% 90% at 30% 100%,rgba(233,185,73,.35),transparent 60%)}
+  .scard .in{padding:9px 10px 10px}
+  .scard h5{margin:0 0 4px;font-size:10.5px;font-weight:800;line-height:1.35;min-height:28px;color:var(--a-ink)}
+  .scard .pr{font-size:11.5px;font-weight:800;color:var(--a-acc)}
+  .scard .pc{font-size:8.5px;color:var(--a-soft)}
+  .scard .pc b{color:var(--a-green)}
+  .rcard{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:11px 12px}
+  .rcard h5{min-height:0;flex:1;margin:0}
+  .rcard .rp{text-align:right}
+
+  /* detail */
+  .dhero{background:linear-gradient(135deg,#7A4E96,#472759);border-radius:16px;min-height:86px;position:relative;overflow:hidden;
+    display:flex;align-items:flex-end;padding:12px}
+  .dhero::after{content:"";position:absolute;inset:0;background:radial-gradient(70% 100% at 25% 100%,rgba(233,185,73,.3),transparent 55%)}
+  .dhero h3{margin:0;color:#fff;font-size:15px;font-weight:800;position:relative;z-index:1;line-height:1.3}
+  .fld{background:var(--a-card);border:1.5px solid var(--a-line);border-radius:13px;padding:12px}
+  .fld .lb{font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--a-faint);margin-bottom:8px}
+  .date-chips{display:flex;gap:8px}
+  .dchip{flex:1;border:1.5px solid var(--a-line);background:#fff;border-radius:10px;padding:9px;font-size:11.5px;font-weight:700;color:var(--a-soft);cursor:pointer}
+  .dchip.on{border-color:var(--a-gold-deep);background:#FFFBEE;color:var(--a-ink)}
+  .qrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--a-line)}
+  .qrow:first-of-type{border-top:none;padding-top:2px}
+  .qrow .who{flex:1}
+  .qrow .who b{font-size:12px;display:block}
+  .qrow .who span{font-size:9px;color:var(--a-soft)}
+  .qrow .p{font-size:11px;font-weight:800;color:var(--a-acc);width:70px;text-align:right;font-variant-numeric:tabular-nums}
+  .qrow .p.free{color:var(--a-green)}
+  .step-ctl{display:flex;align-items:center;gap:7px}
+  .step-ctl button{width:34px;height:34px;border-radius:9px;border:1.5px solid var(--a-line);background:#fff;
+    font-size:17px;font-weight:800;color:var(--a-ink);cursor:pointer;line-height:1}
+  .step-ctl button:disabled{opacity:.3;cursor:default}
+  .step-ctl .n{width:22px;text-align:center;font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+
+  .afoot{flex:none;padding:10px 14px 12px;display:flex;gap:9px;background:linear-gradient(180deg,rgba(251,247,242,0),var(--a-paper) 30%)}
+  .abtn{flex:1;border:none;border-radius:12px;font-size:13px;font-weight:800;padding:14px 8px;cursor:pointer;min-height:46px}
+  .abtn small{display:block;font-size:9px;font-weight:700;opacity:.7}
+  .abtn-gold{background:var(--a-gold);color:var(--a-gold-ink);box-shadow:0 3px 0 var(--a-gold-deep)}
+  .abtn-gold:disabled{opacity:.4;box-shadow:none;cursor:default}
+  .abtn-line{background:#fff;color:var(--a-acc);border:1.5px solid var(--a-acc)}
+
+  /* cart */
+  .cline{background:var(--a-card);border:1.5px solid var(--a-line);border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center}
+  .cline .ci{flex:1;min-width:0}
+  .cline .ci b{font-size:11px;display:block;line-height:1.35}
+  .cline .ci span{font-size:9px;color:var(--a-soft)}
+  .cline .cp{font-size:11.5px;font-weight:800;font-variant-numeric:tabular-nums}
+  .cline .rm{border:none;background:none;color:var(--a-red);font-size:10px;font-weight:700;cursor:pointer;padding:4px}
+  .total-bar{background:var(--a-purple);color:#fff;border-radius:12px;padding:12px 14px;display:flex;align-items:baseline;gap:8px}
+  .total-bar .tl{font-size:10px;font-weight:700;color:#D0BFE2}
+  .total-bar .tv{margin-left:auto;font-size:17px;font-weight:800;color:var(--a-gold);font-variant-numeric:tabular-nums}
+  .empty-note{text-align:center;color:var(--a-faint);font-size:11px;padding:30px 10px}
+
+  /* pay */
+  .pay-opt{background:var(--a-card);border:2px solid var(--a-line);border-radius:13px;padding:13px;display:flex;gap:11px;align-items:center;cursor:pointer;text-align:left}
+  .pay-opt.on{border-color:var(--a-gold-deep);background:#FFFBEE}
+  .pay-opt .pic{flex:none;width:38px;height:38px;border-radius:10px;background:var(--a-purple);display:flex;align-items:center;justify-content:center}
+  .pay-opt h4{margin:0;font-size:12px;font-weight:800}
+  .pay-opt p{margin:2px 0 0;font-size:9px;color:var(--a-soft)}
+  .pay-opt .rad{margin-left:auto;width:18px;height:18px;border-radius:50%;border:2.5px solid var(--a-line);flex:none}
+  .pay-opt.on .rad{border-color:var(--a-gold-deep);background:radial-gradient(circle at center,var(--a-gold-deep) 45%,transparent 50%)}
+
+  /* pay QR */
+  .qr-holder{background:#fff;border:1.5px solid var(--a-line);border-radius:15px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:7px}
+  .qr-holder canvas{width:150px;height:150px;image-rendering:pixelated}
+  .qr-amt{font-size:17px;font-weight:800;color:var(--a-purple);font-variant-numeric:tabular-nums}
+  .qr-meta{font-size:9px;color:var(--a-soft);text-align:center}
+  .countdown{display:flex;gap:6px;justify-content:center;font-size:10.5px;color:var(--a-soft);font-weight:700}
+  .countdown b{color:var(--a-red);font-variant-numeric:tabular-nums;font-size:12px}
+  .demo-pay{background:none;border:1.5px dashed var(--a-faint);color:var(--a-faint);font-size:9px;border-radius:8px;padding:7px 10px;cursor:pointer;margin:0 auto}
+
+  /* success */
+  .succ-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;gap:6px}
+  .succ-ic{width:74px;height:74px;border-radius:50%;background:var(--a-green);display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+  .succ-wrap h3{margin:0;font-size:17px;font-weight:800;color:var(--a-ink)}
+  .succ-wrap p{margin:0;font-size:11px;color:var(--a-soft)}
+  .succ-wrap .ref{font-size:10px;color:var(--a-faint);font-variant-numeric:tabular-nums}
+
+  /* wallet */
+  .tik{background:#fff;border:1.5px solid var(--a-line);border-radius:15px;overflow:hidden}
+  .tik .th{background:var(--a-purple);color:#fff;padding:9px 13px;display:flex;align-items:center;gap:8px}
+  .tik .th b{font-size:11px;flex:1;line-height:1.3}
+  .tik .st{font-size:8px;font-weight:800;background:rgba(233,185,73,.9);color:var(--a-gold-ink);border-radius:999px;padding:3px 8px;letter-spacing:.04em}
+  .tik .tb{display:flex;gap:12px;padding:12px 13px;align-items:center}
+  .tik .tb canvas{width:86px;height:86px;image-rendering:pixelated;flex:none}
+  .tik .ti{flex:1;min-width:0}
+  .tik .ti div{font-size:9.5px;color:var(--a-soft);margin-bottom:3px}
+  .tik .ti div b{color:var(--a-ink)}
+  .tik .ti .code{font-variant-numeric:tabular-nums;color:var(--a-acc);font-weight:700;font-size:9px;letter-spacing:.05em}
+  .wallet-hint{font-size:9.5px;color:var(--a-faint);text-align:center;margin-top:2px}
+
+  /* toast */
+  .toast{position:absolute;left:50%;bottom:96px;transform:translateX(-50%) translateY(16px);background:var(--a-ink);color:#fff;
+    font-size:10.5px;font-weight:700;border-radius:999px;padding:9px 18px;opacity:0;transition:all .25s ease;z-index:60;pointer-events:none;white-space:nowrap}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media(prefers-reduced-motion:reduce){.toast{transition:none}}
+
+  /* ---------- rail ---------- */
+  .rail{display:flex;flex-direction:column;gap:22px}
+  .rail h3{font-family:Georgia,serif;font-size:16px;font-weight:600;margin:0 0 10px;color:var(--pg-ink)}
+  .steps{display:flex;flex-direction:column;gap:5px}
+  .stp{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:10px;border:1px solid transparent;
+    background:none;cursor:pointer;text-align:left;font-family:inherit}
+  .stp .no{flex:none;width:24px;height:24px;border-radius:50%;background:var(--pg-surface);border:1.5px solid var(--pg-line);
+    color:var(--pg-faint);font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .stp .st{font-size:13px;font-weight:600;color:var(--pg-soft)}
+  .stp .st small{display:block;font-size:10.5px;font-weight:500;color:var(--pg-faint)}
+  .stp:hover{border-color:var(--pg-line);background:var(--pg-surface)}
+  .stp.on{background:var(--pg-surface);border-color:var(--pg-gold)}
+  .stp.on .no{background:var(--pg-gold);border-color:var(--pg-gold);color:#fff}
+  .stp.on .st{color:var(--pg-ink)}
+  .note-box{background:var(--pg-surface);border:1px solid var(--pg-line);border-left:3px solid var(--pg-gold);
+    border-radius:0 10px 10px 0;padding:14px 16px;font-size:13px;color:var(--pg-soft);min-height:88px}
+  .note-box b{color:var(--pg-ink)}
+  .hw-list{margin:0;padding:0;list-style:none;font-size:13px}
+  .hw-list li{display:flex;justify-content:space-between;gap:14px;padding:8px 2px;border-bottom:1px solid var(--pg-line);color:var(--pg-soft)}
+  .hw-list li b{color:var(--pg-ink);text-align:right;font-weight:600}
+
+  footer.pg-foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--pg-line);
+    font-size:12.5px;color:var(--pg-faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+  button:focus-visible{outline:3px solid var(--a-acc);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Concept UI · Bản demo lấy ý kiến</p>
+    <h1>Mobile App bán vé tham quan — 8 ngôn ngữ</h1>
+    <p class="lede">Prototype tương tác app di động cho khách tham quan, cùng hệ nhận diện tím Huế với bản kiosk. Khác kiosk ở 3 điểm: chọn ngôn ngữ khi mở app (8 thứ tiếng), <b>ví "Vé của tôi"</b> lưu vé lâu dài trên máy cá nhân, và chọn <b>ngày tham quan</b> (mua trước cho ngày mai). Chạm trực tiếp vào điện thoại mô phỏng hoặc nhảy bước bằng thanh bên phải.</p>
+    <div class="chips">
+      <span class="chip">Ngôn ngữ <b>VI · EN · 한국어 · 中文 · FR · RU · ES · PT</b></span>
+      <span class="chip">Viewport <b>390 × 800 (chuẩn iPhone)</b></span>
+      <span class="chip">Thanh toán <b>VietQR / thẻ quốc tế</b></span>
+      <span class="chip">Giá theo bảng <b>02.06.2026</b></span>
+    </div>
+  </header>
+
+  <div class="stage">
+    <!-- ================= PHONE ================= -->
+    <div class="device-col">
+      <div class="phone">
+        <div class="pscreen" id="pscreen">
+          <div class="notch"></div>
+
+          <!-- S0 language -->
+          <section class="scr scr-lang" data-scr="lang">
+            <div class="lang-inner">
+              <span id="embBig"></span>
+              <h2 data-i18n="langTitle"></h2>
+              <p class="ls">Choose your language · 언어 선택 · 选择语言</p>
+              <div class="lang-grid" id="langGrid"></div>
+              <button class="lang-cta" id="langGo" data-i18n="continue"></button>
+            </div>
+          </section>
+
+          <!-- S1 home -->
+          <section class="scr" data-scr="home">
+            <div class="ahead">
+              <span class="hlogo" data-emb></span>
+              <div class="ht"><b data-i18n="homeTitle"></b><span data-i18n="homeSub"></span></div>
+              <button class="icon-btn" data-go="lang" title="Language">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.6"/><path d="M3.5 12h17M12 3.5c-2.6 2.6-2.6 14.4 0 17M12 3.5c2.6 2.6 2.6 14.4 0 17" stroke="#fff" stroke-width="1.3"/></svg>
+              </button>
+              <button class="icon-btn" data-go="cart" title="Cart">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 5h2l2.2 11h9.6L20 8H7" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="19.5" r="1.4" fill="#fff"/><circle cx="16.5" cy="19.5" r="1.4" fill="#fff"/></svg>
+                <span class="badge" id="cartBadge" style="display:none">0</span>
+              </button>
+            </div>
+            <div class="abody">
+              <div class="hero"><h3 data-i18n="heroT"></h3><p data-i18n="heroS"></p></div>
+              <div class="seg">
+                <button id="segDiem" class="on" data-i18n="tabSites"></button>
+                <button id="segTuyen" data-i18n="tabRoutes"></button>
+              </div>
+              <div class="sgrid" id="homeGrid"></div>
+            </div>
+            <div class="anav" data-nav></div>
+          </section>
+
+          <!-- S2 detail -->
+          <section class="scr" data-scr="detail">
+            <div class="ahead">
+              <button class="back-btn" data-go="home" data-i18n="back"></button>
+              <div class="ht"><b id="dTitle"></b><span id="dSub"></span></div>
+              <button class="icon-btn" data-go="cart">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 5h2l2.2 11h9.6L20 8H7" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="19.5" r="1.4" fill="#fff"/><circle cx="16.5" cy="19.5" r="1.4" fill="#fff"/></svg>
+                <span class="badge cart-badge2" style="display:none">0</span>
+              </button>
+            </div>
+            <div class="abody">
+              <div class="dhero"><h3 id="dHeroName"></h3></div>
+              <div class="fld">
+                <div class="lb" data-i18n="dateLbl"></div>
+                <div class="date-chips">
+                  <button class="dchip on" data-date="today" data-i18n="today"></button>
+                  <button class="dchip" data-date="tomorrow" data-i18n="tomorrow"></button>
+                </div>
+              </div>
+              <div class="fld" id="qtyFld"></div>
+            </div>
+            <div class="afoot">
+              <button class="abtn abtn-line" id="addCartBtn" data-i18n="addCart"></button>
+              <button class="abtn abtn-gold" id="buyNowBtn"><span data-i18n="buyNow"></span><small id="buySum">0đ</small></button>
+            </div>
+          </section>
+
+          <!-- S3 cart -->
+          <section class="scr" data-scr="cart">
+            <div class="ahead">
+              <button class="back-btn" data-go="home" data-i18n="back"></button>
+              <div class="ht"><b data-i18n="cartTitle"></b><span>&nbsp;</span></div>
+            </div>
+            <div class="abody">
+              <div id="cartLines" style="display:flex;flex-direction:column;gap:8px"></div>
+              <p class="empty-note" id="cartEmpty" data-i18n="cartEmpty"></p>
+              <div class="total-bar" id="cartTotalBar"><span class="tl" data-i18n="total"></span><span class="tv" id="cartTotal">0đ</span></div>
+            </div>
+            <div class="afoot">
+              <button class="abtn abtn-gold" id="checkoutBtn" data-go="pay" data-i18n="checkout"></button>
+            </div>
+          </section>
+
+          <!-- S4 pay method -->
+          <section class="scr" data-scr="pay">
+            <div class="ahead">
+              <button class="back-btn" data-go="cart" data-i18n="back"></button>
+              <div class="ht"><b data-i18n="payTitle"></b><span>&nbsp;</span></div>
+            </div>
+            <div class="abody">
+              <button class="pay-opt on" data-pm="vietqr">
+                <span class="pic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.4" stroke="#E9B949" stroke-width="1.7"/><rect x="14" y="3" width="7" height="7" rx="1.4" stroke="#E9B949" stroke-width="1.7"/><rect x="3" y="14" width="7" height="7" rx="1.4" stroke="#E9B949" stroke-width="1.7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z" fill="#E9B949"/></svg></span>
+                <div><h4 data-i18n="vietqrT"></h4><p data-i18n="vietqrD"></p></div>
+                <span class="rad"></span>
+              </button>
+              <button class="pay-opt" data-pm="card">
+                <span class="pic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="5" width="19" height="14" rx="2.2" stroke="#E9B949" stroke-width="1.7"/><path d="M2.5 9.5h19" stroke="#E9B949" stroke-width="1.7"/><path d="M6 15h5" stroke="#E9B949" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+                <div><h4 data-i18n="cardT"></h4><p data-i18n="cardD"></p></div>
+                <span class="rad"></span>
+              </button>
+              <div class="total-bar"><span class="tl" data-i18n="total"></span><span class="tv" id="payTotal">0đ</span></div>
+            </div>
+            <div class="afoot">
+              <button class="abtn abtn-gold" data-go="payqr" data-i18n="payNow"></button>
+            </div>
+          </section>
+
+          <!-- S5 pay QR -->
+          <section class="scr" data-scr="payqr">
+            <div class="ahead">
+              <button class="back-btn" data-go="pay" data-i18n="back"></button>
+              <div class="ht"><b data-i18n="scanTitle"></b><span>&nbsp;</span></div>
+            </div>
+            <div class="abody" style="align-items:center">
+              <p class="wallet-hint" data-i18n="scanSub" style="margin-top:4px"></p>
+              <div class="qr-holder">
+                <canvas id="payQrCanvas" width="210" height="210"></canvas>
+                <div class="qr-amt" id="payQrAmt">0đ</div>
+                <div class="qr-meta">TT BẢO TỒN DI TÍCH CỐ ĐÔ HUẾ<br><b id="payRef">HUE······</b></div>
+              </div>
+              <div class="countdown"><span data-i18n="expire"></span> <b id="cd">02:00</b></div>
+              <button class="demo-pay" id="demoPay" data-i18n="demoPay"></button>
+            </div>
+          </section>
+
+          <!-- S6 success -->
+          <section class="scr" data-scr="success">
+            <div class="succ-wrap">
+              <div class="succ-ic"><svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M6 12.5l4 4 8-8.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <h3 data-i18n="succTitle"></h3>
+              <p data-i18n="succSub"></p>
+              <p class="ref" id="succRef"></p>
+            </div>
+            <div class="afoot" style="flex-direction:column">
+              <button class="abtn abtn-gold" id="viewTicketsBtn" data-i18n="viewTickets"></button>
+              <button class="abtn abtn-line" data-go="home" data-i18n="backHome"></button>
+            </div>
+          </section>
+
+          <!-- S7 wallet -->
+          <section class="scr" data-scr="wallet">
+            <div class="ahead">
+              <span class="hlogo" data-emb></span>
+              <div class="ht"><b data-i18n="walletTitle"></b><span data-i18n="showGate"></span></div>
+              <button class="icon-btn" data-go="lang">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.6"/><path d="M3.5 12h17M12 3.5c-2.6 2.6-2.6 14.4 0 17M12 3.5c2.6 2.6 2.6 14.4 0 17" stroke="#fff" stroke-width="1.3"/></svg>
+              </button>
+            </div>
+            <div class="abody" id="walletBody"></div>
+            <div class="anav" data-nav></div>
+          </section>
+
+          <div class="toast" id="toast"></div>
+          <div class="homebar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= RAIL ================= -->
+    <aside class="rail">
+      <div>
+        <h3>Luồng 8 màn hình</h3>
+        <div class="steps" id="stepRail"></div>
+      </div>
+      <div>
+        <h3>Ghi chú thiết kế</h3>
+        <div class="note-box" id="noteBox"></div>
+      </div>
+      <div>
+        <h3>Khác biệt so với Kiosk</h3>
+        <ul class="hw-list">
+          <li><span>Ngôn ngữ</span><b>8 (kiosk: 3) — khớp phổ Audio Guide</b></li>
+          <li><span>Ví vé cá nhân</span><b>"Vé của tôi" lưu lâu dài</b></li>
+          <li><span>Ngày tham quan</span><b>mua trước hôm nay / ngày mai</b></li>
+          <li><span>In vé nhiệt</span><b>không — chỉ QR trên máy</b></li>
+          <li><span>Điều hướng</span><b>bottom nav + giỏ ở header</b></li>
+          <li><span>Idle timeout</span><b>không cần (máy cá nhân)</b></li>
+          <li><span>Nền tảng đích</span><b>iOS / Android (WebView hoặc native)</b></li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="pg-foot">
+    <span>Giá vé theo bảng công bố áp dụng từ 02.06.2026 · Mã QR chỉ minh hoạ · <a href="../" style="color:var(--pg-accent)">Xem bản Kiosk ›</a></span>
+    <span>Mobile Concept v1 · tím Huế · 8 ngôn ngữ · 2026-07-11</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ---------- sites: names per 8 langs + short names for routes ---------- */
+  function S(id,a,c,vi,en,zh,ko,fr,ru,es,pt,shorts){
+    return {id:id,a:a,c:c,n:{vi:vi,en:en,zh:zh,ko:ko,fr:fr,ru:ru,es:es,pt:pt},s:shorts};
+  }
+  /* shorts: {vi,lat,zh,ko,ru} — fr/es/pt/en dùng lat */
+  var DIEM=[
+    S('dn',200000,40000,'Đại Nội Huế','Hue Imperial City','大内皇城（顺化皇宫）','후에 황궁 (다이노이)','Cité impériale de Hué','Императорская цитадель Хюэ','Ciudadela Imperial de Hue','Cidade Imperial de Hue',
+      {vi:'Đại Nội',lat:'Imperial City',zh:'大内',ko:'황궁',ru:'Цитадель'}),
+    S('mm',150000,30000,'Lăng vua Minh Mạng','Minh Mang Royal Tomb','明命皇陵','민망 황릉','Tombeau de Minh Mang','Гробница Минь Манга','Tumba de Minh Mang','Túmulo de Minh Mang',
+      {vi:'Minh Mạng',lat:'Minh Mang',zh:'明命',ko:'민망',ru:'Минь Манг'}),
+    S('td',150000,30000,'Lăng vua Tự Đức','Tu Duc Royal Tomb','嗣德皇陵','뜨득 황릉','Tombeau de Tu Duc','Гробница Ты Дыка','Tumba de Tu Duc','Túmulo de Tu Duc',
+      {vi:'Tự Đức',lat:'Tu Duc',zh:'嗣德',ko:'뜨득',ru:'Ты Дык'}),
+    S('kd',150000,30000,'Lăng vua Khải Định','Khai Dinh Royal Tomb','启定皇陵','카이딘 황릉','Tombeau de Khai Dinh','Гробница Кхай Диня','Tumba de Khai Dinh','Túmulo de Khai Dinh',
+      {vi:'Khải Định',lat:'Khai Dinh',zh:'启定',ko:'카이딘',ru:'Кхай Динь'}),
+    S('gl',150000,0,'Lăng vua Gia Long','Gia Long Royal Tomb','嘉隆皇陵','자롱 황릉','Tombeau de Gia Long','Гробница Зя Лонга','Tumba de Gia Long','Túmulo de Gia Long',
+      {vi:'Gia Long',lat:'Gia Long',zh:'嘉隆',ko:'자롱',ru:'Зя Лонг'}),
+    S('dk',100000,0,'Lăng vua Đồng Khánh','Dong Khanh Royal Tomb','同庆皇陵','동칸 황릉','Tombeau de Dong Khanh','Гробница Донг Кханя','Tumba de Dong Khanh','Túmulo de Dong Khanh',
+      {vi:'Đồng Khánh',lat:'Dong Khanh',zh:'同庆',ko:'동칸',ru:'Донг Кхань'}),
+    S('tt',50000,0,'Lăng vua Thiệu Trị','Thieu Tri Royal Tomb','绍治皇陵','티에우찌 황릉','Tombeau de Thieu Tri','Гробница Тхиеу Чи','Tumba de Thieu Tri','Túmulo de Thieu Tri',
+      {vi:'Thiệu Trị',lat:'Thieu Tri',zh:'绍治',ko:'티에우찌',ru:'Тхиеу Чи'}),
+    S('bt',50000,0,'Bảo tàng Cổ vật Cung đình Huế','Museum of Royal Antiquities','宫廷古物博物馆','왕실 유물 박물관','Musée des antiquités royales','Музей королевских древностей','Museo de Antigüedades Reales','Museu de Antiguidades Reais',
+      {vi:'Bảo tàng Cổ vật',lat:'Museum',zh:'古物馆',ko:'박물관',ru:'Музей'}),
+    S('hc',50000,0,'Điện Hòn Chén','Hon Chen Temple','惠南殿','혼첸 사원','Temple Hon Chen','Храм Хон Тен','Templo Hon Chen','Templo Hon Chen',
+      {vi:'Hòn Chén',lat:'Hon Chen',zh:'惠南殿',ko:'혼첸',ru:'Хон Тен'}),
+    S('ad',50000,0,'Cung An Định','An Dinh Palace','安定宫','안딘 궁전','Palais An Dinh','Дворец Ан Динь','Palacio An Dinh','Palácio An Dinh',
+      {vi:'Cung An Định',lat:'An Dinh',zh:'安定宫',ko:'안딘궁',ru:'Ан Динь'}),
+    S('ng',50000,0,'Đàn Nam Giao','Nam Giao Esplanade','南郊坛','남자오 제단','Esplanade Nam Giao','Алтарь Нам Зяо','Explanada Nam Giao','Esplanada Nam Giao',
+      {vi:'Đàn Nam Giao',lat:'Nam Giao',zh:'南郊坛',ko:'남자오',ru:'Нам Зяо'}),
+    S('dd',50000,0,'Lăng vua Dục Đức','Duc Duc Royal Tomb','育德皇陵','죽득 황릉','Tombeau de Duc Duc','Гробница Зук Дыка','Tumba de Duc Duc','Túmulo de Duc Duc',
+      {vi:'Dục Đức',lat:'Duc Duc',zh:'育德',ko:'죽득',ru:'Зук Дык'}),
+    S('hv',70000,0,'Hải Vân Quan','Hai Van Gate','海云关','하이번 관문','Porte de Hai Van','Ворота Хайван','Puerta de Hai Van','Portão de Hai Van',
+      {vi:'Hải Vân Quan',lat:'Hai Van',zh:'海云关',ko:'하이번',ru:'Хайван'})
+  ];
+  var TUYEN=[
+    {id:'t1',comps:['mm','gl'],a:240000,c:30000},
+    {id:'t2',comps:['td','dk'],a:200000,c:30000},
+    {id:'t3',comps:['bt','ad'],a:80000,c:0},
+    {id:'t4',comps:['dn','mm','kd'],a:420000,c:80000},
+    {id:'t5',comps:['dn','mm','td'],a:420000,c:80000},
+    {id:'t6',comps:['dn','td','kd'],a:420000,c:80000},
+    {id:'t7',comps:['dn','mm','td','kd'],a:530000,c:100000},
+    {id:'t8',comps:'ALL',a:600000,c:120000}
+  ];
+  var ALL={}; DIEM.forEach(function(x){ALL[x.id]=x;}); TUYEN.forEach(function(x){ALL[x.id]=x;});
+
+  /* ---------- UI strings — 8 languages ---------- */
+  var I18N={
+    vi:{langTitle:'Chọn ngôn ngữ',continue:'Tiếp tục',
+      homeTitle:'Vé Di tích Cố đô Huế',homeSub:'ỨNG DỤNG CHÍNH THỨC',heroT:'Khám phá Cố đô Huế',heroS:'Đặt vé tham quan — dùng QR vào cổng, không xếp hàng',
+      tabSites:'Điểm di tích',tabRoutes:'Vé tuyến',child712:'Trẻ em 7–12',free:'Miễn phí',back:'‹ Quay lại',
+      dateLbl:'Ngày tham quan',today:'Hôm nay',tomorrow:'Ngày mai',
+      adult:'Người lớn',adultSub:'Từ 13 tuổi',child:'Trẻ em',childSub:'7–12 tuổi',
+      addCart:'Thêm vào giỏ',buyNow:'Mua ngay',added:'Đã thêm vào giỏ vé ✓',
+      cartTitle:'Giỏ vé',cartEmpty:'Giỏ vé trống — chọn điểm tham quan để bắt đầu',total:'TỔNG CỘNG',checkout:'Thanh toán',
+      payTitle:'Phương thức thanh toán',vietqrT:'VietQR — app ngân hàng',vietqrD:'Hỗ trợ tất cả ngân hàng & ví Việt Nam',
+      cardT:'Thẻ quốc tế',cardD:'Visa · Mastercard · NAPAS',payNow:'Xác nhận thanh toán',
+      scanTitle:'Quét mã VietQR',scanSub:'Mở app ngân hàng của bạn và quét mã dưới đây',expire:'Mã hết hạn sau',demoPay:'▶ demo — mô phỏng đã thanh toán',
+      succTitle:'Thanh toán thành công!',succSub:'Vé đã được lưu vào mục "Vé của tôi"',viewTickets:'Xem vé của tôi',backHome:'Về trang chủ',orderLbl:'Mã đơn',
+      walletTitle:'Vé của tôi',walletEmpty:'Chưa có vé nào — vé mua xong sẽ nằm ở đây',showGate:'ĐƯA MÃ QR TẠI CỔNG SOÁT VÉ',validOn:'Hiệu lực',unused:'CHƯA SỬ DỤNG',
+      navHome:'Trang chủ',navTickets:'Vé của tôi',lineAdult:'người lớn',lineChild:'trẻ em',
+      routeN:function(n,p){return 'Tuyến '+n+' điểm: '+p;},routeAll:'Tuyến gộp tất cả các điểm'},
+    en:{langTitle:'Choose your language',continue:'Continue',
+      homeTitle:'Hue Monuments Tickets',homeSub:'OFFICIAL APP',heroT:'Explore the Imperial City of Hue',heroS:'Book tickets — enter with QR, skip the queue',
+      tabSites:'Sites',tabRoutes:'Route passes',child712:'Child 7–12',free:'Free',back:'‹ Back',
+      dateLbl:'Visit date',today:'Today',tomorrow:'Tomorrow',
+      adult:'Adult',adultSub:'Age 13+',child:'Child',childSub:'Age 7–12',
+      addCart:'Add to cart',buyNow:'Buy now',added:'Added to cart ✓',
+      cartTitle:'Cart',cartEmpty:'Your cart is empty — pick a site to begin',total:'TOTAL',checkout:'Checkout',
+      payTitle:'Payment method',vietqrT:'VietQR — banking app',vietqrD:'All Vietnamese banks & e-wallets',
+      cardT:'International card',cardD:'Visa · Mastercard · NAPAS',payNow:'Confirm payment',
+      scanTitle:'Scan the VietQR',scanSub:'Open your banking app and scan the code below',expire:'Code expires in',demoPay:'▶ demo — simulate payment',
+      succTitle:'Payment successful!',succSub:'Tickets saved to "My Tickets"',viewTickets:'View my tickets',backHome:'Back to home',orderLbl:'Order',
+      walletTitle:'My Tickets',walletEmpty:'No tickets yet — purchases will appear here',showGate:'SHOW QR AT THE ENTRANCE GATE',validOn:'Valid on',unused:'UNUSED',
+      navHome:'Home',navTickets:'My Tickets',lineAdult:'adult',lineChild:'child',
+      routeN:function(n,p){return n+'-site route: '+p;},routeAll:'All-sites pass'},
+    ko:{langTitle:'언어를 선택하세요',continue:'계속',
+      homeTitle:'후에 유적지 입장권',homeSub:'공식 앱',heroT:'후에 고도를 탐험하세요',heroS:'입장권 예매 — QR로 바로 입장, 줄 서지 않아도 됩니다',
+      tabSites:'개별 유적지',tabRoutes:'연계권',child712:'어린이 7–12세',free:'무료',back:'‹ 뒤로',
+      dateLbl:'방문 날짜',today:'오늘',tomorrow:'내일',
+      adult:'성인',adultSub:'13세 이상',child:'어린이',childSub:'7–12세',
+      addCart:'장바구니 담기',buyNow:'바로 구매',added:'장바구니에 담았습니다 ✓',
+      cartTitle:'장바구니',cartEmpty:'장바구니가 비어 있습니다 — 유적지를 선택하세요',total:'합계',checkout:'결제하기',
+      payTitle:'결제 수단',vietqrT:'VietQR — 은행 앱',vietqrD:'베트남 모든 은행·전자지갑 지원',
+      cardT:'해외 카드',cardD:'Visa · Mastercard · NAPAS',payNow:'결제 확인',
+      scanTitle:'VietQR 스캔',scanSub:'은행 앱을 열고 아래 QR을 스캔하세요',expire:'유효 시간',demoPay:'▶ 데모 — 결제 완료 시뮬레이션',
+      succTitle:'결제 완료!',succSub:'티켓이 ‘내 티켓’에 저장되었습니다',viewTickets:'내 티켓 보기',backHome:'홈으로',orderLbl:'주문번호',
+      walletTitle:'내 티켓',walletEmpty:'아직 티켓이 없습니다 — 구매한 티켓이 여기에 표시됩니다',showGate:'입장 시 QR코드를 제시하세요',validOn:'유효일',unused:'미사용',
+      navHome:'홈',navTickets:'내 티켓',lineAdult:'성인',lineChild:'어린이',
+      routeN:function(n,p){return n+'개소 연계권: '+p;},routeAll:'전체 유적지 통합권'},
+    zh:{langTitle:'选择语言',continue:'继续',
+      homeTitle:'顺化遗迹门票',homeSub:'官方应用',heroT:'探索顺化古都',heroS:'预订门票 — 凭二维码入园，无需排队',
+      tabSites:'单点门票',tabRoutes:'联票',child712:'儿童 7–12岁',free:'免费',back:'‹ 返回',
+      dateLbl:'参观日期',today:'今天',tomorrow:'明天',
+      adult:'成人',adultSub:'13岁以上',child:'儿童',childSub:'7–12岁',
+      addCart:'加入购物篮',buyNow:'立即购买',added:'已加入购物篮 ✓',
+      cartTitle:'购物篮',cartEmpty:'购物篮为空 — 请选择景点',total:'合计',checkout:'去结算',
+      payTitle:'支付方式',vietqrT:'VietQR — 银行App',vietqrD:'支持越南所有银行及电子钱包',
+      cardT:'国际银行卡',cardD:'Visa · 万事达 · NAPAS',payNow:'确认支付',
+      scanTitle:'扫描 VietQR',scanSub:'打开您的银行App，扫描下方二维码',expire:'二维码有效时间',demoPay:'▶ 演示 — 模拟支付成功',
+      succTitle:'支付成功！',succSub:'门票已保存至"我的门票"',viewTickets:'查看我的门票',backHome:'返回首页',orderLbl:'订单号',
+      walletTitle:'我的门票',walletEmpty:'暂无门票 — 购买后将显示在这里',showGate:'入园时请出示二维码',validOn:'有效日期',unused:'未使用',
+      navHome:'首页',navTickets:'我的门票',lineAdult:'成人',lineChild:'儿童',
+      routeN:function(n,p){var c=['','','两','三','四'][n]||n;return c+'点联票：'+p;},routeAll:'全景通票（所有景点）'},
+    fr:{langTitle:'Choisissez votre langue',continue:'Continuer',
+      homeTitle:'Billets Monuments de Hué',homeSub:'APPLICATION OFFICIELLE',heroT:'Explorez la cité impériale de Hué',heroS:'Réservez vos billets — entrée par QR, sans file d’attente',
+      tabSites:'Sites',tabRoutes:'Circuits',child712:'Enfant 7–12 ans',free:'Gratuit',back:'‹ Retour',
+      dateLbl:'Date de visite',today:'Aujourd’hui',tomorrow:'Demain',
+      adult:'Adulte',adultSub:'13 ans et +',child:'Enfant',childSub:'7–12 ans',
+      addCart:'Ajouter au panier',buyNow:'Acheter',added:'Ajouté au panier ✓',
+      cartTitle:'Panier',cartEmpty:'Panier vide — choisissez un site pour commencer',total:'TOTAL',checkout:'Payer',
+      payTitle:'Mode de paiement',vietqrT:'VietQR — appli bancaire',vietqrD:'Banques et portefeuilles vietnamiens',
+      cardT:'Carte internationale',cardD:'Visa · Mastercard · NAPAS',payNow:'Confirmer le paiement',
+      scanTitle:'Scannez le VietQR',scanSub:'Ouvrez votre appli bancaire et scannez le code ci-dessous',expire:'Expire dans',demoPay:'▶ démo — simuler le paiement',
+      succTitle:'Paiement réussi !',succSub:'Billets enregistrés dans « Mes billets »',viewTickets:'Voir mes billets',backHome:'Accueil',orderLbl:'Commande',
+      walletTitle:'Mes billets',walletEmpty:'Aucun billet — vos achats apparaîtront ici',showGate:'PRÉSENTEZ LE QR À L’ENTRÉE',validOn:'Valable le',unused:'NON UTILISÉ',
+      navHome:'Accueil',navTickets:'Mes billets',lineAdult:'adulte(s)',lineChild:'enfant(s)',
+      routeN:function(n,p){return 'Circuit '+n+' sites : '+p;},routeAll:'Pass tous les sites'},
+    ru:{langTitle:'Выберите язык',continue:'Продолжить',
+      homeTitle:'Билеты — памятники Хюэ',homeSub:'ОФИЦИАЛЬНОЕ ПРИЛОЖЕНИЕ',heroT:'Откройте древнюю столицу Хюэ',heroS:'Покупайте билеты — вход по QR-коду, без очередей',
+      tabSites:'Объекты',tabRoutes:'Маршруты',child712:'Дети 7–12 лет',free:'Бесплатно',back:'‹ Назад',
+      dateLbl:'Дата посещения',today:'Сегодня',tomorrow:'Завтра',
+      adult:'Взрослый',adultSub:'от 13 лет',child:'Ребёнок',childSub:'7–12 лет',
+      addCart:'В корзину',buyNow:'Купить',added:'Добавлено в корзину ✓',
+      cartTitle:'Корзина',cartEmpty:'Корзина пуста — выберите объект',total:'ИТОГО',checkout:'Оплатить',
+      payTitle:'Способ оплаты',vietqrT:'VietQR — приложение банка',vietqrD:'Все вьетнамские банки и кошельки',
+      cardT:'Международная карта',cardD:'Visa · Mastercard · NAPAS',payNow:'Подтвердить оплату',
+      scanTitle:'Сканируйте VietQR',scanSub:'Откройте приложение банка и отсканируйте код ниже',expire:'Код истекает через',demoPay:'▶ демо — имитация оплаты',
+      succTitle:'Оплата прошла успешно!',succSub:'Билеты сохранены в «Мои билеты»',viewTickets:'Мои билеты',backHome:'На главную',orderLbl:'Заказ',
+      walletTitle:'Мои билеты',walletEmpty:'Билетов пока нет — покупки появятся здесь',showGate:'ПОКАЖИТЕ QR-КОД НА ВХОДЕ',validOn:'Действителен',unused:'НЕ ИСПОЛЬЗОВАН',
+      navHome:'Главная',navTickets:'Билеты',lineAdult:'взр.',lineChild:'дет.',
+      routeN:function(n,p){return 'Маршрут, '+n+' объекта: '+p;},routeAll:'Единый билет — все объекты'},
+    es:{langTitle:'Elige tu idioma',continue:'Continuar',
+      homeTitle:'Entradas Monumentos de Hue',homeSub:'APLICACIÓN OFICIAL',heroT:'Explora la ciudadela imperial de Hue',heroS:'Compra entradas — accede con QR, sin colas',
+      tabSites:'Sitios',tabRoutes:'Rutas',child712:'Niños 7–12',free:'Gratis',back:'‹ Atrás',
+      dateLbl:'Fecha de visita',today:'Hoy',tomorrow:'Mañana',
+      adult:'Adulto',adultSub:'13 años o más',child:'Niño',childSub:'7–12 años',
+      addCart:'Añadir al carrito',buyNow:'Comprar',added:'Añadido al carrito ✓',
+      cartTitle:'Carrito',cartEmpty:'Carrito vacío — elige un sitio para empezar',total:'TOTAL',checkout:'Pagar',
+      payTitle:'Método de pago',vietqrT:'VietQR — app bancaria',vietqrD:'Bancos y billeteras de Vietnam',
+      cardT:'Tarjeta internacional',cardD:'Visa · Mastercard · NAPAS',payNow:'Confirmar pago',
+      scanTitle:'Escanea el VietQR',scanSub:'Abre tu app bancaria y escanea el código',expire:'Caduca en',demoPay:'▶ demo — simular pago',
+      succTitle:'¡Pago realizado!',succSub:'Entradas guardadas en «Mis entradas»',viewTickets:'Ver mis entradas',backHome:'Inicio',orderLbl:'Pedido',
+      walletTitle:'Mis entradas',walletEmpty:'Aún no hay entradas — tus compras aparecerán aquí',showGate:'MUESTRA EL QR EN LA ENTRADA',validOn:'Válido el',unused:'SIN USAR',
+      navHome:'Inicio',navTickets:'Entradas',lineAdult:'adulto(s)',lineChild:'niño(s)',
+      routeN:function(n,p){return 'Ruta de '+n+' sitios: '+p;},routeAll:'Pase todos los sitios'},
+    pt:{langTitle:'Escolha o seu idioma',continue:'Continuar',
+      homeTitle:'Bilhetes Monumentos de Hue',homeSub:'APLICAÇÃO OFICIAL',heroT:'Explore a cidade imperial de Hue',heroS:'Compre bilhetes — entre com QR, sem filas',
+      tabSites:'Locais',tabRoutes:'Rotas',child712:'Crianças 7–12',free:'Grátis',back:'‹ Voltar',
+      dateLbl:'Data da visita',today:'Hoje',tomorrow:'Amanhã',
+      adult:'Adulto',adultSub:'13 anos ou mais',child:'Criança',childSub:'7–12 anos',
+      addCart:'Adicionar ao carrinho',buyNow:'Comprar',added:'Adicionado ao carrinho ✓',
+      cartTitle:'Carrinho',cartEmpty:'Carrinho vazio — escolha um local para começar',total:'TOTAL',checkout:'Pagar',
+      payTitle:'Forma de pagamento',vietqrT:'VietQR — app do banco',vietqrD:'Bancos e carteiras do Vietname',
+      cardT:'Cartão internacional',cardD:'Visa · Mastercard · NAPAS',payNow:'Confirmar pagamento',
+      scanTitle:'Digitalize o VietQR',scanSub:'Abra o app do seu banco e digitalize o código',expire:'Expira em',demoPay:'▶ demo — simular pagamento',
+      succTitle:'Pagamento concluído!',succSub:'Bilhetes guardados em «Os meus bilhetes»',viewTickets:'Ver os meus bilhetes',backHome:'Início',orderLbl:'Pedido',
+      walletTitle:'Os meus bilhetes',walletEmpty:'Ainda não há bilhetes — as compras aparecerão aqui',showGate:'MOSTRE O QR NA ENTRADA',validOn:'Válido em',unused:'POR USAR',
+      navHome:'Início',navTickets:'Bilhetes',lineAdult:'adulto(s)',lineChild:'criança(s)',
+      routeN:function(n,p){return 'Rota de '+n+' locais: '+p;},routeAll:'Passe todos os locais'}
+  };
+  var LANGS=[
+    ['vi','Tiếng Việt','Vietnamese'],['en','English','English'],
+    ['ko','한국어','Korean'],['zh','中文','Chinese'],
+    ['fr','Français','French'],['ru','Русский','Russian'],
+    ['es','Español','Spanish'],['pt','Português','Portuguese']
+  ];
+
+  /* ---------- state & helpers ---------- */
+  var state={scr:'lang',lang:'vi',mode:'diem',pick:null,date:'today',qa:1,qc:0,cart:[],order:null,tickets:[]};
+  function T(k){return I18N[state.lang][k];}
+  function shortName(site){
+    if(state.lang==='vi')return site.s.vi;
+    if(state.lang==='zh')return site.s.zh;
+    if(state.lang==='ko')return site.s.ko;
+    if(state.lang==='ru')return site.s.ru;
+    return site.s.lat;
+  }
+  function nm(item){
+    if(item.n)return item.n[state.lang]||item.n.vi;
+    if(item.comps==='ALL')return T('routeAll');
+    var parts=item.comps.map(function(id){return shortName(ALL[id]);}).join(' – ');
+    return T('routeN')(item.comps.length,parts);
+  }
+  function vnd(n){return n===0?T('free'):n.toLocaleString('vi-VN')+'đ';}
+  function vndZ(n){return n.toLocaleString('vi-VN')+'đ';}
+  function dateLabel(d){return d==='today'?T('today'):T('tomorrow');}
+
+  /* QR-look renderer (mock, deterministic) */
+  function drawQR(canvas,seed){
+    var ctx=canvas.getContext('2d'),N=29,Sz=canvas.width,q=2,cell=Sz/(N+q*2);
+    var h=2166136261;for(var i=0;i<seed.length;i++){h^=seed.charCodeAt(i);h=Math.imul(h,16777619);}
+    function rnd(){h=Math.imul(h^(h>>>15),2246822519);h=Math.imul(h^(h>>>13),3266489917);return((h^=h>>>16)>>>0)/4294967296;}
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,Sz,Sz);ctx.fillStyle='#101828';
+    function inF(r,c){return(r<7&&c<7)||(r<7&&c>=N-7)||(r>=N-7&&c<7);}
+    for(var r=0;r<N;r++)for(var c=0;c<N;c++){
+      if(inF(r,c))continue;
+      if(r===6||c===6){if((r+c)%2===0)ctx.fillRect((c+q)*cell,(r+q)*cell,cell,cell);continue;}
+      if(rnd()<0.46)ctx.fillRect((c+q)*cell,(r+q)*cell,cell,cell);
+    }
+    function fin(r,c){
+      ctx.fillRect((c+q)*cell,(r+q)*cell,7*cell,7*cell);
+      ctx.fillStyle='#fff';ctx.fillRect((c+1+q)*cell,(r+1+q)*cell,5*cell,5*cell);
+      ctx.fillStyle='#101828';ctx.fillRect((c+2+q)*cell,(r+2+q)*cell,3*cell,3*cell);
+    }
+    fin(0,0);fin(0,N-7);fin(N-7,0);
+  }
+
+  /* ---------- emblem ---------- */
+  function emblem(size){
+    return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 48 48" role="img" aria-label="Logo TTBTDT Cố đô Huế">'
+      +'<circle cx="24" cy="24" r="22.5" fill="#1D4E9E"/>'
+      +'<circle cx="24" cy="24" r="22.5" fill="none" stroke="#E9B949" stroke-width="1.6"/>'
+      +'<circle cx="24" cy="24" r="17.5" fill="none" stroke="#fff" stroke-width=".9" opacity=".55"/>'
+      +'<g stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round">'
+      +'<path d="M13 32h22"/><path d="M15 32v-7h18v7"/><path d="M15 25l2-3h14l2 3"/>'
+      +'<path d="M20 32v-4.5h8V32"/><path d="M21 22v-3.5h6V22"/><path d="M20 18.5l1.4-2h5.2l1.4 2"/>'
+      +'<path d="M17 14.5c2-1.6 4.5-1 4.5-1M31 14.5c-2-1.6-4.5-1-4.5-1" stroke-width="1.1"/>'
+      +'</g><circle cx="24" cy="10.5" r="1" fill="#E9B949"/></svg>';
+  }
+  document.getElementById('embBig').innerHTML=emblem(72);
+  document.querySelectorAll('[data-emb]').forEach(function(el){el.innerHTML=emblem(30);});
+
+  /* ---------- bottom nav ---------- */
+  var ICONS={
+    home:'<svg viewBox="0 0 24 24" fill="none"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4v-6h-6v6H5a1 1 0 01-1-1v-9z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>',
+    tik:'<svg viewBox="0 0 24 24" fill="none"><path d="M4 8a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2a2 2 0 100-4V8z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M13 6v2M13 11v2M13 16v2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="1 3"/></svg>'
+  };
+  function buildNavs(){
+    document.querySelectorAll('[data-nav]').forEach(function(el){
+      el.innerHTML='<button data-go="home" data-navk="home">'+ICONS.home+'<span>'+T('navHome')+'</span></button>'
+        +'<button data-go="wallet" data-navk="wallet">'+ICONS.tik+'<span>'+T('navTickets')+'</span>'
+        +(state.tickets.length?'<span class="nbadge">'+state.tickets.length+'</span>':'')+'</button>';
+      el.querySelectorAll('[data-go]').forEach(function(b){
+        b.addEventListener('click',function(){go(b.dataset.go);});
+      });
+    });
+    paintNav();
+  }
+  function paintNav(){
+    document.querySelectorAll('[data-navk]').forEach(function(b){
+      b.classList.toggle('on',b.dataset.navk===state.scr);
+    });
+  }
+
+  /* ---------- i18n apply ---------- */
+  function applyStatic(){
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      var v=T(el.dataset.i18n);if(typeof v==='string')el.innerHTML=v;
+    });
+    document.querySelectorAll('.lang-opt').forEach(function(l){l.classList.toggle('on',l.dataset.lang===state.lang);});
+    buildNavs();
+  }
+  function setLang(lang){
+    state.lang=lang;applyStatic();
+    if(state.scr==='home')renderHome();
+    if(state.scr==='detail')renderDetail();
+    if(state.scr==='cart')renderCart();
+    if(state.scr==='pay')document.getElementById('payTotal').textContent=vndZ(cartTotal());
+    if(state.scr==='wallet')renderWallet();
+  }
+
+  /* language grid */
+  var lg=document.getElementById('langGrid');
+  LANGS.forEach(function(l){
+    var b=document.createElement('button');b.className='lang-opt';b.dataset.lang=l[0];
+    b.innerHTML='<b>'+l[1]+'</b><span>'+l[2]+'</span>';
+    b.addEventListener('click',function(){setLang(l[0]);});
+    lg.appendChild(b);
+  });
+  document.getElementById('langGo').addEventListener('click',function(){go('home');});
+
+  /* ---------- rail ---------- */
+  var NOTES={
+    lang:'<b>Chọn ngôn ngữ khi mở app lần đầu</b> — 8 thứ tiếng khớp phổ khách quốc tế của Huế (trùng nhóm ngôn ngữ Audio Guide, trừ Nhật/Thái/Đức/Ý). Đổi lại bất kỳ lúc nào qua nút quả cầu 🌐 trên header.',
+    home:'<b>Trang chủ 2 tab</b> (điểm lẻ / vé tuyến) + giỏ vé trên header. Thẻ điểm hiển thị ảnh + giá từ, lưới 2 cột chuẩn ngón cái. Bottom nav: Trang chủ · Vé của tôi.',
+    detail:'<b>Màn chi tiết gộp chọn ngày + số lượng</b> — mobile cho phép mua trước (hôm nay/ngày mai; bản thật mở lịch đầy đủ). 2 CTA: thêm giỏ (mua tiếp) hoặc mua ngay (đi thẳng giỏ).',
+    cart:'<b>Giỏ vé</b> gộp nhiều điểm + nhiều ngày trong 1 đơn; mỗi dòng ghi rõ ngày tham quan. Sửa/xoá từng dòng.',
+    pay:'<b>2 phương thức:</b> VietQR (khách Việt) và thẻ quốc tế Visa/MC (khách nước ngoài — nhóm chọn EN/KO/ZH/FR/RU/ES/PT). Bản thật thêm Apple Pay/Google Pay.',
+    payqr:'<b>Trên mobile, VietQR có thể deep-link thẳng sang app ngân hàng</b> thay vì bắt quét (quét dùng khi mở trên máy khác). Countdown 2 phút; webhook về là tự nhảy màn thành công.',
+    success:'<b>Vé phát hành gắn vào thiết bị</b> — lưu vào ví "Vé của tôi", không cần in. Đây là khác biệt lớn nhất với kiosk.',
+    wallet:'<b>Ví vé offline-first:</b> QR hiển thị không cần mạng (vé đã tải về máy). Mỗi vé 1 QR + trạng thái (chưa dùng/đã dùng); cổng soát quét trực tiếp từ màn hình điện thoại.'
+  };
+  var RAIL=[
+    ['lang','Chọn ngôn ngữ','8 thứ tiếng · lần đầu mở app'],
+    ['home','Trang chủ','2 tab: 13 điểm · 8 tuyến'],
+    ['detail','Chi tiết & số lượng','ngày tham quan + ADT/CHD'],
+    ['cart','Giỏ vé','nhiều điểm · nhiều ngày / 1 đơn'],
+    ['pay','Phương thức','VietQR · thẻ quốc tế'],
+    ['payqr','Thanh toán QR','countdown 2 phút'],
+    ['success','Thành công','vé gắn vào thiết bị'],
+    ['wallet','Vé của tôi','ví QR offline, soát tại cổng']
+  ];
+  var railEl=document.getElementById('stepRail');
+  RAIL.forEach(function(r,i){
+    var b=document.createElement('button');b.className='stp';b.dataset.scr=r[0];
+    b.innerHTML='<span class="no">'+i+'</span><span class="st">'+r[1]+'<small>'+r[2]+'</small></span>';
+    b.addEventListener('click',function(){jumpTo(r[0]);});
+    railEl.appendChild(b);
+  });
+
+  /* ---------- navigation ---------- */
+  var cdTimer=null;
+  function show(scr){
+    state.scr=scr;
+    document.querySelectorAll('.scr').forEach(function(s){s.classList.toggle('active',s.dataset.scr===scr);});
+    document.querySelectorAll('.stp').forEach(function(b){b.classList.toggle('on',b.dataset.scr===scr);});
+    document.getElementById('noteBox').innerHTML=NOTES[scr]||'';
+    paintNav();
+    clearInterval(cdTimer);
+    if(scr==='payqr')startCountdown();
+  }
+  function go(scr){
+    if(scr==='home')renderHome();
+    if(scr==='detail')renderDetail();
+    if(scr==='cart')renderCart();
+    if(scr==='pay'){if(!state.cart.length){go('home');return;}document.getElementById('payTotal').textContent=vndZ(cartTotal());}
+    if(scr==='payqr')renderPayQR();
+    if(scr==='wallet')renderWallet();
+    show(scr);
+  }
+  function jumpTo(scr){
+    if(scr==='detail'&&!state.pick){state.pick='dn';state.qa=2;state.qc=1;}
+    if(['cart','pay','payqr'].indexOf(scr)>=0&&!state.cart.length){
+      state.cart=[{id:'dn',date:'today',a:2,c:1},{id:'t2',date:'tomorrow',a:1,c:0}];
+    }
+    if(scr==='success'){if(!state.cart.length)state.cart=[{id:'dn',date:'today',a:2,c:1}];completePurchase();return;}
+    if(scr==='wallet'&&!state.tickets.length){
+      state.cart=[{id:'dn',date:'today',a:1,c:1}];completePurchase();go('wallet');return;
+    }
+    go(scr);
+  }
+  document.querySelectorAll('[data-go]').forEach(function(b){
+    b.addEventListener('click',function(){go(b.dataset.go);});
+  });
+  document.querySelectorAll('.pay-opt').forEach(function(p){
+    p.addEventListener('click',function(){
+      document.querySelectorAll('.pay-opt').forEach(function(x){x.classList.remove('on');});p.classList.add('on');});
+  });
+  document.getElementById('segDiem').addEventListener('click',function(){state.mode='diem';renderHome();});
+  document.getElementById('segTuyen').addEventListener('click',function(){state.mode='tuyen';renderHome();});
+
+  /* toast */
+  var toastT=null;
+  function toast(msg){
+    var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+    clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('show');},1600);
+  }
+
+  /* ---------- home ---------- */
+  function cartCount(){return state.cart.length;}
+  function paintBadges(){
+    var n=cartCount();
+    var b1=document.getElementById('cartBadge');
+    b1.style.display=n?'flex':'none';b1.textContent=n;
+    document.querySelectorAll('.cart-badge2').forEach(function(b){
+      b.style.display=n?'flex':'none';b.textContent=n;
+    });
+  }
+  function renderHome(){
+    document.getElementById('segDiem').classList.toggle('on',state.mode==='diem');
+    document.getElementById('segTuyen').classList.toggle('on',state.mode==='tuyen');
+    var grid=document.getElementById('homeGrid');grid.innerHTML='';
+    var data=state.mode==='diem'?DIEM:TUYEN;
+    data.forEach(function(d){
+      var b=document.createElement('button');
+      b.className='scard'+(state.mode==='tuyen'?' rcard':'');
+      if(state.mode==='diem'){
+        b.innerHTML='<div class="im"></div><div class="in"><h5>'+nm(d)+'</h5>'
+          +'<div class="pr">'+vndZ(d.a)+'</div>'
+          +'<div class="pc">'+T('child712')+': '+(d.c===0?'<b>'+T('free')+'</b>':vndZ(d.c))+'</div></div>';
+      }else{
+        b.innerHTML='<h5 style="font-size:10.5px;font-weight:800;line-height:1.35">'+nm(d)+'</h5>'
+          +'<div class="rp"><div class="pr">'+vndZ(d.a)+'</div>'
+          +'<div class="pc">'+T('child712')+': '+(d.c===0?'<b>'+T('free')+'</b>':vndZ(d.c))+'</div></div>';
+      }
+      b.addEventListener('click',function(){state.pick=d.id;state.qa=1;state.qc=0;state.date='today';go('detail');});
+      grid.appendChild(b);
+    });
+    paintBadges();
+  }
+
+  /* ---------- detail ---------- */
+  function renderDetail(){
+    var d=ALL[state.pick];if(!d)return;
+    document.getElementById('dTitle').textContent=nm(d);
+    document.getElementById('dSub').textContent=d.n?(state.lang==='vi'?d.n.en:d.n.vi):'';
+    document.getElementById('dHeroName').textContent=nm(d);
+    document.querySelectorAll('.dchip').forEach(function(c){
+      c.classList.toggle('on',c.dataset.date===state.date);
+      c.onclick=function(){state.date=c.dataset.date;renderDetail();};
+    });
+    var f=document.getElementById('qtyFld');
+    f.innerHTML='<div class="lb">'+T('adult')+' / '+T('child')+'</div>'
+      +'<div class="qrow"><div class="who"><b>'+T('adult')+'</b><span>'+T('adultSub')+'</span></div><div class="p">'+vndZ(d.a)+'</div>'
+      +'<div class="step-ctl"><button id="aM">−</button><span class="n" id="aN">'+state.qa+'</span><button id="aP">＋</button></div></div>'
+      +'<div class="qrow"><div class="who"><b>'+T('child')+'</b><span>'+T('childSub')+'</span></div><div class="p'+(d.c===0?' free':'')+'">'+vnd(d.c)+'</div>'
+      +'<div class="step-ctl"><button id="cM">−</button><span class="n" id="cN">'+state.qc+'</span><button id="cP">＋</button></div></div>';
+    function paint(){
+      document.getElementById('aN').textContent=state.qa;
+      document.getElementById('cN').textContent=state.qc;
+      document.getElementById('aM').disabled=state.qa<=0;
+      document.getElementById('cM').disabled=state.qc<=0;
+      var sum=state.qa*d.a+state.qc*d.c;
+      document.getElementById('buySum').textContent=vndZ(sum);
+      var dis=(state.qa+state.qc)===0;
+      document.getElementById('buyNowBtn').disabled=dis;
+      document.getElementById('addCartBtn').disabled=dis;
+    }
+    document.getElementById('aP').onclick=function(){if(state.qa<9)state.qa++;paint();};
+    document.getElementById('aM').onclick=function(){if(state.qa>0)state.qa--;paint();};
+    document.getElementById('cP').onclick=function(){if(state.qc<9)state.qc++;paint();};
+    document.getElementById('cM').onclick=function(){if(state.qc>0)state.qc--;paint();};
+    paint();paintBadges();
+  }
+  function addLine(){
+    var key=state.pick+'|'+state.date;
+    var ex=state.cart.find(function(l){return l.id+'|'+l.date===key;});
+    if(ex){ex.a+=state.qa;ex.c+=state.qc;}
+    else state.cart.push({id:state.pick,date:state.date,a:state.qa,c:state.qc});
+  }
+  document.getElementById('addCartBtn').addEventListener('click',function(){
+    if(state.qa+state.qc===0)return;
+    addLine();toast(T('added'));paintBadges();go('home');
+  });
+  document.getElementById('buyNowBtn').addEventListener('click',function(){
+    if(state.qa+state.qc===0)return;
+    addLine();go('cart');
+  });
+
+  /* ---------- cart ---------- */
+  function cartTotal(){
+    return state.cart.reduce(function(s,l){var d=ALL[l.id];return s+l.a*d.a+l.c*d.c;},0);
+  }
+  function renderCart(){
+    var box=document.getElementById('cartLines');box.innerHTML='';
+    state.cart.forEach(function(l,idx){
+      var d=ALL[l.id],sum=l.a*d.a+l.c*d.c;
+      var parts=[];if(l.a)parts.push(l.a+' '+T('lineAdult'));if(l.c)parts.push(l.c+' '+T('lineChild'));
+      var div=document.createElement('div');div.className='cline';
+      div.innerHTML='<div class="ci"><b>'+nm(d)+'</b><span>'+dateLabel(l.date)+' · '+parts.join(' · ')+'</span></div>'
+        +'<div class="cp">'+vndZ(sum)+'</div><button class="rm">✕</button>';
+      div.querySelector('.rm').addEventListener('click',function(){state.cart.splice(idx,1);renderCart();});
+      box.appendChild(div);
+    });
+    var empty=!state.cart.length;
+    document.getElementById('cartEmpty').style.display=empty?'block':'none';
+    document.getElementById('cartTotalBar').style.display=empty?'none':'flex';
+    document.getElementById('checkoutBtn').disabled=empty;
+    document.getElementById('cartTotal').textContent=vndZ(cartTotal());
+    paintBadges();
+  }
+
+  /* ---------- pay ---------- */
+  var orderCounter=513;
+  function makeOrder(){
+    orderCounter++;
+    state.order={ref:'HUE'+String(202600+orderCounter),total:cartTotal()};
+  }
+  function renderPayQR(){
+    makeOrder();
+    document.getElementById('payQrAmt').textContent=vndZ(state.order.total);
+    document.getElementById('payRef').textContent=state.order.ref;
+    drawQR(document.getElementById('payQrCanvas'),'VIETQR|'+state.order.ref+'|'+state.order.total);
+  }
+  function startCountdown(){
+    var t=120,el=document.getElementById('cd');
+    function paint(){el.textContent=String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');}
+    paint();
+    cdTimer=setInterval(function(){t--;if(t<=0){clearInterval(cdTimer);go('cart');return;}paint();},1000);
+  }
+  function completePurchase(){
+    if(!state.order)makeOrder();
+    var n=state.tickets.length;
+    state.cart.forEach(function(l){
+      var d=ALL[l.id];
+      for(var i=0;i<l.a;i++){n++;state.tickets.push({name:nm(d),id:l.id,cls:'ADT',date:l.date,price:d.a,code:state.order.ref+'-'+String(n).padStart(2,'0')});}
+      for(var j=0;j<l.c;j++){n++;state.tickets.push({name:nm(d),id:l.id,cls:'CHD',date:l.date,price:d.c,code:state.order.ref+'-'+String(n).padStart(2,'0')});}
+    });
+    document.getElementById('succRef').textContent=T('orderLbl')+' '+state.order.ref+' · '+vndZ(state.order.total);
+    state.cart=[];
+    buildNavs();paintBadges();
+    show('success');
+  }
+  document.getElementById('demoPay').addEventListener('click',completePurchase);
+  document.getElementById('viewTicketsBtn').addEventListener('click',function(){go('wallet');});
+
+  /* ---------- wallet ---------- */
+  function renderWallet(){
+    var body=document.getElementById('walletBody');body.innerHTML='';
+    if(!state.tickets.length){
+      body.innerHTML='<p class="empty-note">'+T('walletEmpty')+'</p>';return;
+    }
+    state.tickets.slice().reverse().forEach(function(t){
+      var d=ALL[t.id];
+      var div=document.createElement('div');div.className='tik';
+      div.innerHTML='<div class="th"><b>'+(d?nm(d):t.name)+'</b><span class="st">'+T('unused')+'</span></div>'
+        +'<div class="tb"><canvas width="120" height="120"></canvas>'
+        +'<div class="ti">'
+        +'<div><b>'+(t.cls==='ADT'?T('adult'):T('child'))+'</b> · '+vnd(t.price)+'</div>'
+        +'<div>'+T('validOn')+': <b>'+dateLabel(t.date)+'</b></div>'
+        +'<div class="code">'+t.code+'</div>'
+        +'</div></div>';
+      body.appendChild(div);
+      drawQR(div.querySelector('canvas'),'TICKET|'+t.code);
+    });
+  }
+
+  /* ---------- boot ---------- */
+  applyStatic();
+  renderHome();
+  show('lang');
+})();
+</script>
